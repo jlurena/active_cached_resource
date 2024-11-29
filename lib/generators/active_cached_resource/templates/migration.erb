@@ -1,0 +1,16 @@
+class CreateActiveCachedResourceTable < ActiveRecord::Migration<%= migration_version %>
+  def up
+    create_table :active_cached_resources, id: false do |t|
+      t.binary :key, limit: 512, null: false
+      t.binary :value, null: false
+      t.datetime :expires_at, null: false
+
+      t.index [:key, :expires_at], unique: true, name: "index_active_cached_resources_on_key_and_expires_at"
+      t.index :key, name: "index_active_cached_resources_on_key"
+    end
+  end
+
+  def down
+    drop_table :active_cached_resources
+  end
+end

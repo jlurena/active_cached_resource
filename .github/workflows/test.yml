@@ -1,0 +1,35 @@
+name: Test
+on:
+  workflow_dispatch:
+  workflow_call:
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}-test
+  cancel-in-progress: true
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - ruby: "3.2"
+          - ruby: "3.3"
+          - ruby: head
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
+      - name: Test
+        run: |
+          bundle exec rspec \
+            -f j -o tmp/json-reports/rspec_results-ruby${{ matrix.ruby }}.json \
+            -f p
+      - name: RSpec Report
+        uses: SonicGarden/rspec-report-action@v5
+        with:
+          json-path: tmp/json-reports/rspec_results-ruby${{ matrix.ruby }}.json
+          title: RSpec Report - Ruby ${{ matrix.ruby }}
+        if: always()
