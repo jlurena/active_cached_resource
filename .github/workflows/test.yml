@@ -31,5 +31,5 @@ jobs:
         uses: SonicGarden/rspec-report-action@v5
         with:
           json-path: tmp/json-reports/rspec_results-ruby${{ matrix.ruby }}.json
-          title: RSpec Report - Ruby ${{ matrix.ruby }}
+          title: ':cold_sweat: Ruby:${{ matrix.ruby }}'
         if: always()
