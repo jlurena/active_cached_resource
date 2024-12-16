@@ -20,3 +20,4 @@ AllCops:
   Exclude:
     - example/**/*
     - lib/activeresource/**/*
+    - sorbet/**/*

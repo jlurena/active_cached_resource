@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require "rubygems"
-require "active_resource"
+require_relative "../lib/active_resource"
 require "benchmark"
 
 TIMES = (ENV["N"] || 10_000).to_i

@@ -7,7 +7,7 @@ require "fixtures/person"
 require "fixtures/product"
 require "active_job"
 require "active_job/arguments"
-require "active_resource/active_job_serializer"
+require_relative "../../lib/active_resource/active_job_serializer"
 
 class ActiveJobSerializerTest < ActiveSupport::TestCase
   setup do

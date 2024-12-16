@@ -18,7 +18,7 @@ jobs:
       contents: write
     runs-on: ubuntu-latest
     env:
-      BUNDLE_ONLY: ci
+      BUNDLE_ONLY: versioning
     needs: [lint, test]
     steps:
       - uses: actions/checkout@v4
@@ -51,6 +51,9 @@ jobs:
     name: Release gem to RubyGems.org
     needs: [version]
     runs-on: ubuntu-latest
+    env:
+      BUNDLE_WITHOUT: 'versioning:development:test'
+      CI: true
     permissions:
       id-token: write
       contents: write
@@ -64,4 +67,6 @@ jobs:
         with:
           ruby-version: 3.2.2
           bundler-cache: true
+      - name: Update RubyGems
+        run: gem update --system
       - uses: rubygems/release-gem@v1

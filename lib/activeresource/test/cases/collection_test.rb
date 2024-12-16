@@ -48,6 +48,30 @@ class ReduxCollection < ActiveResource::Base
   self.collection_parser = PaginatedCollection
 end
 
+class ArrayMethodDelegate < ActiveSupport::TestCase
+  def setup
+    @collection = ActiveResource::Collection.new
+  end
+
+  def test_collection_respond_to_delegated_methods
+    delegated_methods = [
+      :==, :[], :&, :*, :+, :-, :<=>, :all?, :any?, :as_json, :at, :assoc, :blank?, :bsearch, :bsearch_index,
+      :collect, :combination, :compact, :count, :cycle, :deconstruct, :deep_dup, :dig, :difference, :drop,
+      :drop_while, :each, :each_index, :empty?, :eql?, :excluding, :filter, :fifth, :find_index, :first,
+      :flatten, :forty_two, :fourth, :from, :hash, :include?, :including, :index, :inspect, :intersect?,
+      :intersection, :join, :last, :length, :map, :max, :min, :minmax, :none?, :one?, :pack, :permutation,
+      :pretty_print_cycle, :present?, :product, :reject, :repeated_combination, :repeated_permutation,
+      :rassoc, :reverse, :reverse_each, :rindex, :rotate, :sample, :second, :second_to_last, :select,
+      :shelljoin, :shuffle, :size, :slice, :sort, :sum, :take, :take_while, :third, :third_to_last, :to,
+      :to_a, :to_ary, :to_fs, :to_formatted_s, :to_h, :to_param, :to_query, :to_s, :to_sentence, :to_xml,
+      :transpose, :union, :uniq, :values_at, :without, :zip
+    ]
+
+    delegated_methods.each do |method|
+      assert @collection.respond_to?(method), "Collection should respond to #{method}"
+    end
+  end
+end
 
 class CollectionInheritanceTest < ActiveSupport::TestCase
   def setup

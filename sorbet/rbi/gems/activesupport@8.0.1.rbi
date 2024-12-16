@@ -3043,7 +3043,10 @@ end
 module ActiveSupport::ClassAttribute
   class << self
     # source://activesupport//lib/active_support/class_attribute.rb#6
-    def redefine(owner, name, value); end
+    def redefine(owner, name, namespaced_name, value); end
+
+    # source://activesupport//lib/active_support/class_attribute.rb#26
+    def redefine_method(owner, name, private: T.unsafe(nil), &block); end
   end
 end
 
@@ -3810,11 +3813,11 @@ class ActiveSupport::CurrentAttributes
   def resolve_defaults; end
 
   class << self
-    # source://activesupport//lib/active_support/class_attribute.rb#12
+    # source://activesupport//lib/active_support/callbacks.rb#69
     def __callbacks; end
 
-    # source://activesupport//lib/active_support/class_attribute.rb#15
-    def __callbacks=(new_value); end
+    # source://activesupport//lib/active_support/callbacks.rb#69
+    def __callbacks=(value); end
 
     # source://activesupport//lib/active_support/callbacks.rb#915
     def _reset_callbacks; end
@@ -3847,11 +3850,11 @@ class ActiveSupport::CurrentAttributes
     # source://activesupport//lib/active_support/current_attributes.rb#160
     def clear_all; end
 
-    # source://activesupport//lib/active_support/class_attribute.rb#12
+    # source://activesupport//lib/active_support/current_attributes.rb#195
     def defaults; end
 
-    # source://activesupport//lib/active_support/class_attribute.rb#15
-    def defaults=(new_value); end
+    # source://activesupport//lib/active_support/current_attributes.rb#195
+    def defaults=(value); end
 
     # source://activesupport//lib/active_support/current_attributes.rb#195
     def defaults?; end
@@ -3876,6 +3879,18 @@ class ActiveSupport::CurrentAttributes
     def set(*_arg0, **_arg1, &_arg2); end
 
     private
+
+    # source://activesupport//lib/active_support/class_attribute.rb#15
+    def __class_attr___callbacks; end
+
+    # source://activesupport//lib/active_support/class_attribute.rb#17
+    def __class_attr___callbacks=(new_value); end
+
+    # source://activesupport//lib/active_support/class_attribute.rb#15
+    def __class_attr_defaults; end
+
+    # source://activesupport//lib/active_support/class_attribute.rb#17
+    def __class_attr_defaults=(new_value); end
 
     # source://activesupport//lib/active_support/current_attributes.rb#170
     def current_instances; end
@@ -5970,11 +5985,11 @@ class ActiveSupport::ExecutionWrapper
   def hook_state; end
 
   class << self
-    # source://activesupport//lib/active_support/class_attribute.rb#12
+    # source://activesupport//lib/active_support/callbacks.rb#69
     def __callbacks; end
 
-    # source://activesupport//lib/active_support/class_attribute.rb#15
-    def __callbacks=(new_value); end
+    # source://activesupport//lib/active_support/callbacks.rb#69
+    def __callbacks=(value); end
 
     # source://activesupport//lib/active_support/callbacks.rb#915
     def _complete_callbacks; end
@@ -6034,6 +6049,14 @@ class ActiveSupport::ExecutionWrapper
     #
     # source://activesupport//lib/active_support/execution_wrapper.rb#86
     def wrap(source: T.unsafe(nil)); end
+
+    private
+
+    # source://activesupport//lib/active_support/class_attribute.rb#15
+    def __class_attr___callbacks; end
+
+    # source://activesupport//lib/active_support/class_attribute.rb#17
+    def __class_attr___callbacks=(new_value); end
   end
 end
 
@@ -7861,11 +7884,11 @@ class ActiveSupport::LogSubscriber < ::ActiveSupport::Subscriber
     # source://activesupport//lib/active_support/log_subscriber.rb#112
     def flush_all!; end
 
-    # source://activesupport//lib/active_support/class_attribute.rb#12
+    # source://activesupport//lib/active_support/log_subscriber.rb#84
     def log_levels; end
 
-    # source://activesupport//lib/active_support/class_attribute.rb#15
-    def log_levels=(new_value); end
+    # source://activesupport//lib/active_support/log_subscriber.rb#84
+    def log_levels=(value); end
 
     # source://activesupport//lib/active_support/log_subscriber.rb#84
     def log_levels?; end
@@ -7884,6 +7907,12 @@ class ActiveSupport::LogSubscriber < ::ActiveSupport::Subscriber
     def logger=(_arg0); end
 
     private
+
+    # source://activesupport//lib/active_support/class_attribute.rb#15
+    def __class_attr_log_levels; end
+
+    # source://activesupport//lib/active_support/class_attribute.rb#17
+    def __class_attr_log_levels=(new_value); end
 
     # source://activesupport//lib/active_support/log_subscriber.rb#117
     def fetch_public_methods(subscriber, inherit_all); end
@@ -7923,6 +7952,112 @@ ActiveSupport::LogSubscriber::MODES = T.let(T.unsafe(nil), Hash)
 
 # source://activesupport//lib/active_support/log_subscriber.rb#75
 ActiveSupport::LogSubscriber::RED = T.let(T.unsafe(nil), String)
+
+# Provides some helpers to deal with testing log subscribers by setting up
+# notifications. Take for instance Active Record subscriber tests:
+#
+#   class SyncLogSubscriberTest < ActiveSupport::TestCase
+#     include ActiveSupport::LogSubscriber::TestHelper
+#
+#     setup do
+#       ActiveRecord::LogSubscriber.attach_to(:active_record)
+#     end
+#
+#     def test_basic_query_logging
+#       Developer.all.to_a
+#       wait
+#       assert_equal 1, @logger.logged(:debug).size
+#       assert_match(/Developer Load/, @logger.logged(:debug).last)
+#       assert_match(/SELECT \* FROM "developers"/, @logger.logged(:debug).last)
+#     end
+#   end
+#
+# All you need to do is to ensure that your log subscriber is added to
+# Rails::Subscriber, as in the second line of the code above. The test
+# helpers are responsible for setting up the queue and subscriptions, and
+# turning colors in logs off.
+#
+# The messages are available in the @logger instance, which is a logger with
+# limited powers (it actually does not send anything to your output), and
+# you can collect them doing @logger.logged(level), where level is the level
+# used in logging, like info, debug, warn, and so on.
+#
+# source://activesupport//lib/active_support/log_subscriber/test_helper.rb#37
+module ActiveSupport::LogSubscriber::TestHelper
+  # Overwrite if you use another logger in your log subscriber.
+  #
+  #   def logger
+  #     ActiveRecord::Base.logger = @logger
+  #   end
+  #
+  # source://activesupport//lib/active_support/log_subscriber/test_helper.rb#101
+  def set_logger(logger); end
+
+  # source://activesupport//lib/active_support/log_subscriber/test_helper.rb#38
+  def setup; end
+
+  # source://activesupport//lib/active_support/log_subscriber/test_helper.rb#49
+  def teardown; end
+
+  # Wait notifications to be published.
+  #
+  # source://activesupport//lib/active_support/log_subscriber/test_helper.rb#92
+  def wait; end
+end
+
+# source://activesupport//lib/active_support/log_subscriber/test_helper.rb#54
+class ActiveSupport::LogSubscriber::TestHelper::MockLogger
+  include ::Logger::Severity
+
+  # @return [MockLogger] a new instance of MockLogger
+  #
+  # source://activesupport//lib/active_support/log_subscriber/test_helper.rb#60
+  def initialize(level = T.unsafe(nil)); end
+
+  # source://activesupport//lib/active_support/log_subscriber/test_helper.rb#84
+  def debug?; end
+
+  # source://activesupport//lib/active_support/log_subscriber/test_helper.rb#84
+  def error?; end
+
+  # source://activesupport//lib/active_support/log_subscriber/test_helper.rb#84
+  def fatal?; end
+
+  # source://activesupport//lib/active_support/log_subscriber/test_helper.rb#78
+  def flush; end
+
+  # Returns the value of attribute flush_count.
+  #
+  # source://activesupport//lib/active_support/log_subscriber/test_helper.rb#57
+  def flush_count; end
+
+  # source://activesupport//lib/active_support/log_subscriber/test_helper.rb#84
+  def info?; end
+
+  # Returns the value of attribute level.
+  #
+  # source://activesupport//lib/active_support/log_subscriber/test_helper.rb#58
+  def level; end
+
+  # Sets the attribute level
+  #
+  # @param value the value to set the attribute level to.
+  #
+  # source://activesupport//lib/active_support/log_subscriber/test_helper.rb#58
+  def level=(_arg0); end
+
+  # source://activesupport//lib/active_support/log_subscriber/test_helper.rb#74
+  def logged(level); end
+
+  # source://activesupport//lib/active_support/log_subscriber/test_helper.rb#66
+  def method_missing(level, message = T.unsafe(nil)); end
+
+  # source://activesupport//lib/active_support/log_subscriber/test_helper.rb#84
+  def unknown?; end
+
+  # source://activesupport//lib/active_support/log_subscriber/test_helper.rb#84
+  def warn?; end
+end
 
 # source://activesupport//lib/active_support/log_subscriber.rb#81
 ActiveSupport::LogSubscriber::WHITE = T.let(T.unsafe(nil), String)
@@ -8702,11 +8837,19 @@ class ActiveSupport::Messages::Codec
   def use_message_serializer_for_metadata?; end
 
   class << self
-    # source://activesupport//lib/active_support/class_attribute.rb#12
+    # source://activesupport//lib/active_support/messages/codec.rb#12
     def default_serializer; end
 
+    # source://activesupport//lib/active_support/messages/codec.rb#12
+    def default_serializer=(value); end
+
+    private
+
     # source://activesupport//lib/active_support/class_attribute.rb#15
-    def default_serializer=(new_value); end
+    def __class_attr_default_serializer; end
+
+    # source://activesupport//lib/active_support/class_attribute.rb#17
+    def __class_attr_default_serializer=(new_value); end
   end
 end
 
@@ -10548,23 +10691,37 @@ class ActiveSupport::NumberHelper::NumberConverter
     # source://activesupport//lib/active_support/number_helper/number_converter.rb#120
     def convert(number, options); end
 
-    # source://activesupport//lib/active_support/class_attribute.rb#12
+    # source://activesupport//lib/active_support/number_helper/number_converter.rb#14
     def namespace; end
 
-    # source://activesupport//lib/active_support/class_attribute.rb#15
-    def namespace=(new_value); end
+    # source://activesupport//lib/active_support/number_helper/number_converter.rb#14
+    def namespace=(value); end
 
     # source://activesupport//lib/active_support/number_helper/number_converter.rb#14
     def namespace?; end
 
-    # source://activesupport//lib/active_support/class_attribute.rb#12
+    # source://activesupport//lib/active_support/number_helper/number_converter.rb#17
     def validate_float; end
 
-    # source://activesupport//lib/active_support/class_attribute.rb#15
-    def validate_float=(new_value); end
+    # source://activesupport//lib/active_support/number_helper/number_converter.rb#17
+    def validate_float=(value); end
 
     # source://activesupport//lib/active_support/number_helper/number_converter.rb#17
     def validate_float?; end
+
+    private
+
+    # source://activesupport//lib/active_support/class_attribute.rb#15
+    def __class_attr_namespace; end
+
+    # source://activesupport//lib/active_support/class_attribute.rb#17
+    def __class_attr_namespace=(new_value); end
+
+    # source://activesupport//lib/active_support/class_attribute.rb#15
+    def __class_attr_validate_float; end
+
+    # source://activesupport//lib/active_support/class_attribute.rb#17
+    def __class_attr_validate_float=(new_value); end
   end
 end
 
@@ -10585,11 +10742,13 @@ class ActiveSupport::NumberHelper::NumberToCurrencyConverter < ::ActiveSupport::
   def options; end
 
   class << self
-    # source://activesupport//lib/active_support/class_attribute.rb#12
-    def namespace; end
+    private
 
     # source://activesupport//lib/active_support/class_attribute.rb#15
-    def namespace=(new_value); end
+    def __class_attr_namespace; end
+
+    # source://activesupport//lib/active_support/class_attribute.rb#17
+    def __class_attr_namespace=(new_value); end
   end
 end
 
@@ -10607,11 +10766,13 @@ class ActiveSupport::NumberHelper::NumberToDelimitedConverter < ::ActiveSupport:
   def parts; end
 
   class << self
-    # source://activesupport//lib/active_support/class_attribute.rb#12
-    def validate_float; end
+    private
 
     # source://activesupport//lib/active_support/class_attribute.rb#15
-    def validate_float=(new_value); end
+    def __class_attr_validate_float; end
+
+    # source://activesupport//lib/active_support/class_attribute.rb#17
+    def __class_attr_validate_float=(new_value); end
   end
 end
 
@@ -10638,17 +10799,19 @@ class ActiveSupport::NumberHelper::NumberToHumanConverter < ::ActiveSupport::Num
   def unit_exponents(units); end
 
   class << self
-    # source://activesupport//lib/active_support/class_attribute.rb#12
-    def namespace; end
+    private
 
     # source://activesupport//lib/active_support/class_attribute.rb#15
-    def namespace=(new_value); end
+    def __class_attr_namespace; end
 
-    # source://activesupport//lib/active_support/class_attribute.rb#12
-    def validate_float; end
+    # source://activesupport//lib/active_support/class_attribute.rb#17
+    def __class_attr_namespace=(new_value); end
 
     # source://activesupport//lib/active_support/class_attribute.rb#15
-    def validate_float=(new_value); end
+    def __class_attr_validate_float; end
+
+    # source://activesupport//lib/active_support/class_attribute.rb#17
+    def __class_attr_validate_float=(new_value); end
   end
 end
 
@@ -10686,17 +10849,19 @@ class ActiveSupport::NumberHelper::NumberToHumanSizeConverter < ::ActiveSupport:
   def unit; end
 
   class << self
-    # source://activesupport//lib/active_support/class_attribute.rb#12
-    def namespace; end
+    private
 
     # source://activesupport//lib/active_support/class_attribute.rb#15
-    def namespace=(new_value); end
+    def __class_attr_namespace; end
 
-    # source://activesupport//lib/active_support/class_attribute.rb#12
-    def validate_float; end
+    # source://activesupport//lib/active_support/class_attribute.rb#17
+    def __class_attr_namespace=(new_value); end
 
     # source://activesupport//lib/active_support/class_attribute.rb#15
-    def validate_float=(new_value); end
+    def __class_attr_validate_float; end
+
+    # source://activesupport//lib/active_support/class_attribute.rb#17
+    def __class_attr_validate_float=(new_value); end
   end
 end
 
@@ -10709,11 +10874,13 @@ class ActiveSupport::NumberHelper::NumberToPercentageConverter < ::ActiveSupport
   def convert; end
 
   class << self
-    # source://activesupport//lib/active_support/class_attribute.rb#12
-    def namespace; end
+    private
 
     # source://activesupport//lib/active_support/class_attribute.rb#15
-    def namespace=(new_value); end
+    def __class_attr_namespace; end
+
+    # source://activesupport//lib/active_support/class_attribute.rb#17
+    def __class_attr_namespace=(new_value); end
   end
 end
 
@@ -10765,17 +10932,19 @@ class ActiveSupport::NumberHelper::NumberToRoundedConverter < ::ActiveSupport::N
   def strip_insignificant_zeros; end
 
   class << self
-    # source://activesupport//lib/active_support/class_attribute.rb#12
-    def namespace; end
+    private
 
     # source://activesupport//lib/active_support/class_attribute.rb#15
-    def namespace=(new_value); end
+    def __class_attr_namespace; end
 
-    # source://activesupport//lib/active_support/class_attribute.rb#12
-    def validate_float; end
+    # source://activesupport//lib/active_support/class_attribute.rb#17
+    def __class_attr_namespace=(new_value); end
 
     # source://activesupport//lib/active_support/class_attribute.rb#15
-    def validate_float=(new_value); end
+    def __class_attr_validate_float; end
+
+    # source://activesupport//lib/active_support/class_attribute.rb#17
+    def __class_attr_validate_float=(new_value); end
   end
 end
 
@@ -11377,12 +11546,6 @@ class ActiveSupport::Reloader < ::ActiveSupport::ExecutionWrapper
   def run!; end
 
   class << self
-    # source://activesupport//lib/active_support/class_attribute.rb#12
-    def __callbacks; end
-
-    # source://activesupport//lib/active_support/class_attribute.rb#15
-    def __callbacks=(new_value); end
-
     # source://activesupport//lib/active_support/callbacks.rb#915
     def _class_unload_callbacks; end
 
@@ -11405,23 +11568,23 @@ class ActiveSupport::Reloader < ::ActiveSupport::ExecutionWrapper
     # source://activesupport//lib/active_support/reloader.rb#39
     def before_class_unload(*args, &block); end
 
-    # source://activesupport//lib/active_support/class_attribute.rb#12
+    # source://activesupport//lib/active_support/reloader.rb#85
     def check; end
 
     # source://activesupport//lib/active_support/reloader.rb#87
     def check!; end
 
-    # source://activesupport//lib/active_support/class_attribute.rb#15
-    def check=(new_value); end
+    # source://activesupport//lib/active_support/reloader.rb#85
+    def check=(value); end
 
     # source://activesupport//lib/active_support/reloader.rb#85
     def check?; end
 
-    # source://activesupport//lib/active_support/class_attribute.rb#12
+    # source://activesupport//lib/active_support/reloader.rb#84
     def executor; end
 
-    # source://activesupport//lib/active_support/class_attribute.rb#15
-    def executor=(new_value); end
+    # source://activesupport//lib/active_support/reloader.rb#84
+    def executor=(value); end
 
     # source://activesupport//lib/active_support/reloader.rb#84
     def executor?; end
@@ -11449,6 +11612,26 @@ class ActiveSupport::Reloader < ::ActiveSupport::ExecutionWrapper
     #
     # source://activesupport//lib/active_support/reloader.rb#71
     def wrap(**kwargs); end
+
+    private
+
+    # source://activesupport//lib/active_support/class_attribute.rb#15
+    def __class_attr___callbacks; end
+
+    # source://activesupport//lib/active_support/class_attribute.rb#17
+    def __class_attr___callbacks=(new_value); end
+
+    # source://activesupport//lib/active_support/class_attribute.rb#15
+    def __class_attr_check; end
+
+    # source://activesupport//lib/active_support/class_attribute.rb#17
+    def __class_attr_check=(new_value); end
+
+    # source://activesupport//lib/active_support/class_attribute.rb#15
+    def __class_attr_executor; end
+
+    # source://activesupport//lib/active_support/class_attribute.rb#17
+    def __class_attr_executor=(new_value); end
   end
 end
 
@@ -12211,43 +12394,43 @@ class ActiveSupport::TestCase < ::Minitest::Test
   # source://activesupport//lib/active_support/callbacks.rb#923
   def _teardown_callbacks; end
 
-  # source://minitest/5.25.2/lib/minitest/assertions.rb#731
+  # source://minitest/5.25.4/lib/minitest/assertions.rb#731
   def assert_no_match(matcher, obj, msg = T.unsafe(nil)); end
 
-  # source://minitest/5.25.2/lib/minitest/assertions.rb#660
+  # source://minitest/5.25.4/lib/minitest/assertions.rb#660
   def assert_not_empty(obj, msg = T.unsafe(nil)); end
 
-  # source://minitest/5.25.2/lib/minitest/assertions.rb#671
+  # source://minitest/5.25.4/lib/minitest/assertions.rb#671
   def assert_not_equal(exp, act, msg = T.unsafe(nil)); end
 
-  # source://minitest/5.25.2/lib/minitest/assertions.rb#683
+  # source://minitest/5.25.4/lib/minitest/assertions.rb#683
   def assert_not_in_delta(exp, act, delta = T.unsafe(nil), msg = T.unsafe(nil)); end
 
-  # source://minitest/5.25.2/lib/minitest/assertions.rb#695
+  # source://minitest/5.25.4/lib/minitest/assertions.rb#695
   def assert_not_in_epsilon(a, b, epsilon = T.unsafe(nil), msg = T.unsafe(nil)); end
 
-  # source://minitest/5.25.2/lib/minitest/assertions.rb#702
+  # source://minitest/5.25.4/lib/minitest/assertions.rb#702
   def assert_not_includes(collection, obj, msg = T.unsafe(nil)); end
 
-  # source://minitest/5.25.2/lib/minitest/assertions.rb#713
+  # source://minitest/5.25.4/lib/minitest/assertions.rb#713
   def assert_not_instance_of(cls, obj, msg = T.unsafe(nil)); end
 
-  # source://minitest/5.25.2/lib/minitest/assertions.rb#723
+  # source://minitest/5.25.4/lib/minitest/assertions.rb#723
   def assert_not_kind_of(cls, obj, msg = T.unsafe(nil)); end
 
-  # source://minitest/5.25.2/lib/minitest/assertions.rb#741
+  # source://minitest/5.25.4/lib/minitest/assertions.rb#741
   def assert_not_nil(obj, msg = T.unsafe(nil)); end
 
-  # source://minitest/5.25.2/lib/minitest/assertions.rb#776
+  # source://minitest/5.25.4/lib/minitest/assertions.rb#776
   def assert_not_operator(o1, op, o2 = T.unsafe(nil), msg = T.unsafe(nil)); end
 
-  # source://minitest/5.25.2/lib/minitest/assertions.rb#799
+  # source://minitest/5.25.4/lib/minitest/assertions.rb#799
   def assert_not_predicate(o1, op, msg = T.unsafe(nil)); end
 
-  # source://minitest/5.25.2/lib/minitest/assertions.rb#808
+  # source://minitest/5.25.4/lib/minitest/assertions.rb#808
   def assert_not_respond_to(obj, meth, msg = T.unsafe(nil), include_all: T.unsafe(nil)); end
 
-  # source://minitest/5.25.2/lib/minitest/assertions.rb#817
+  # source://minitest/5.25.4/lib/minitest/assertions.rb#817
   def assert_not_same(exp, act, msg = T.unsafe(nil)); end
 
   # source://activesupport//lib/active_support/testing/file_fixtures.rb#20
@@ -12259,15 +12442,15 @@ class ActiveSupport::TestCase < ::Minitest::Test
   # source://activesupport//lib/active_support/test_case.rb#300
   def inspect; end
 
-  # source://minitest/5.25.2/lib/minitest.rb#376
+  # source://minitest/5.25.4/lib/minitest.rb#376
   def method_name; end
 
   class << self
-    # source://activesupport//lib/active_support/class_attribute.rb#12
+    # source://activesupport//lib/active_support/callbacks.rb#69
     def __callbacks; end
 
-    # source://activesupport//lib/active_support/class_attribute.rb#15
-    def __callbacks=(new_value); end
+    # source://activesupport//lib/active_support/callbacks.rb#69
+    def __callbacks=(value); end
 
     # source://activesupport//lib/active_support/callbacks.rb#915
     def _setup_callbacks; end
@@ -12281,11 +12464,11 @@ class ActiveSupport::TestCase < ::Minitest::Test
     # source://activesupport//lib/active_support/callbacks.rb#919
     def _teardown_callbacks=(value); end
 
-    # source://activesupport//lib/active_support/class_attribute.rb#12
+    # source://activesupport//lib/active_support/testing/file_fixtures.rb#20
     def file_fixture_path; end
 
-    # source://activesupport//lib/active_support/class_attribute.rb#15
-    def file_fixture_path=(new_value); end
+    # source://activesupport//lib/active_support/testing/file_fixtures.rb#20
+    def file_fixture_path=(value); end
 
     # source://activesupport//lib/active_support/testing/file_fixtures.rb#20
     def file_fixture_path?; end
@@ -12383,6 +12566,20 @@ class ActiveSupport::TestCase < ::Minitest::Test
     #
     # source://activesupport//lib/active_support/test_case.rb#34
     def test_order=(new_order); end
+
+    private
+
+    # source://activesupport//lib/active_support/class_attribute.rb#15
+    def __class_attr___callbacks; end
+
+    # source://activesupport//lib/active_support/class_attribute.rb#17
+    def __class_attr___callbacks=(new_value); end
+
+    # source://activesupport//lib/active_support/class_attribute.rb#15
+    def __class_attr_file_fixture_path; end
+
+    # source://activesupport//lib/active_support/class_attribute.rb#17
+    def __class_attr_file_fixture_path=(new_value); end
   end
 end
 
@@ -13804,7 +14001,7 @@ class ActiveSupport::TimeWithZone
 
   # Returns a string of the object's date, time, zone, and offset from UTC.
   #
-  #   Time.zone.now.inspect # => "Thu, 04 Dec 2014 11:00:25.624541392 EST -05:00"
+  #   Time.zone.now.inspect # => "2024-11-13 07:00:10.528054960 UTC +00:00"
   #
   # source://activesupport//lib/active_support/time_with_zone.rb#140
   def inspect; end
@@ -15063,11 +15260,11 @@ class Array
   # ==== Options
   #
   # * <tt>:words_connector</tt> - The sign or word used to join all but the last
-  #   element in arrays with three or more elements (default: ", ").
+  #   element in arrays with three or more elements (default: <tt>", "</tt>).
   # * <tt>:last_word_connector</tt> - The sign or word used to join the last element
-  #   in arrays with three or more elements (default: ", and ").
+  #   in arrays with three or more elements (default: <tt>", and "</tt>).
   # * <tt>:two_words_connector</tt> - The sign or word used to join the elements
-  #   in arrays with two elements (default: " and ").
+  #   in arrays with two elements (default: <tt>" and "</tt>).
   # * <tt>:locale</tt> - If +i18n+ is available, you can set a locale and use
   #   the connector options defined on the 'support.array' namespace in the
   #   corresponding dictionary file.
@@ -16876,7 +17073,7 @@ ERB::Util::TAG_NAME_REPLACEMENT_CHAR = T.let(T.unsafe(nil), String)
 # source://activesupport//lib/active_support/core_ext/erb/util.rb#44
 ERB::Util::TAG_NAME_START_CODEPOINTS = T.let(T.unsafe(nil), String)
 
-# source://activesupport//lib/active_support/core_ext/enumerable.rb#18
+# source://activesupport//lib/active_support/core_ext/object/json.rb#145
 module Enumerable
   include ::ActiveSupport::ToJsonWithActiveSupportEncoder
   extend ::ActiveSupport::EnumerableCoreExt::Constants
@@ -19783,6 +19980,7 @@ class Pathname
 end
 
 module Process
+  extend ::SQLite3::ForkSafety::CoreExt
   extend ::ActiveSupport::ForkTracker::CoreExt
 
   class << self
@@ -19797,7 +19995,7 @@ class Process::Status
   def as_json(options = T.unsafe(nil)); end
 end
 
-# source://activesupport//lib/active_support/core_ext/enumerable.rb#238
+# source://activesupport//lib/active_support/core_ext/object/json.rb#157
 class Range
   include ::ActiveSupport::RangeWithFormat
   include ::ActiveSupport::CompareWithRange
@@ -19867,33 +20065,10 @@ end
 # source://activesupport//lib/active_support/core_ext/securerandom.rb#5
 module SecureRandom
   class << self
-    # SecureRandom.base36 generates a random base36 string in lowercase.
-    #
-    # The argument _n_ specifies the length of the random string to be generated.
-    #
-    # If _n_ is not specified or is +nil+, 16 is assumed. It may be larger in the future.
-    # This method can be used over +base58+ if a deterministic case key is necessary.
-    #
-    # The result will contain alphanumeric characters in lowercase.
-    #
-    #   p SecureRandom.base36 # => "4kugl2pdqmscqtje"
-    #   p SecureRandom.base36(24) # => "77tmhrhjfvfdwodq8w7ev2m7"
-    #
-    # source://activesupport//lib/active_support/core_ext/securerandom.rb#34
+    # source://activesupport//lib/active_support/core_ext/securerandom.rb#45
     def base36(n = T.unsafe(nil)); end
 
-    # SecureRandom.base58 generates a random base58 string.
-    #
-    # The argument _n_ specifies the length of the random string to be generated.
-    #
-    # If _n_ is not specified or is +nil+, 16 is assumed. It may be larger in the future.
-    #
-    # The result may contain alphanumeric characters except 0, O, I, and l.
-    #
-    #   p SecureRandom.base58 # => "4kUgL2pdQMSCQtjE"
-    #   p SecureRandom.base58(24) # => "77TMHrHJFvFDwodq8w7Ev2m7"
-    #
-    # source://activesupport//lib/active_support/core_ext/securerandom.rb#19
+    # source://activesupport//lib/active_support/core_ext/securerandom.rb#20
     def base58(n = T.unsafe(nil)); end
   end
 end
@@ -19923,7 +20098,7 @@ end
 #
 #   'ScaleScore'.tableize # => "scale_scores"
 #
-# source://activesupport//lib/active_support/core_ext/object/blank.rb#135
+# source://activesupport//lib/active_support/core_ext/string/multibyte.rb#5
 class String
   include ::Comparable
 

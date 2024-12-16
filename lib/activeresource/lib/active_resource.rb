@@ -46,4 +46,4 @@ module ActiveResource
   autoload :Validations, "#{__dir__}/active_resource/validations.rb"
 end
 
-require "active_resource/railtie" if defined?(Rails.application)
+require_relative "active_resource/railtie" if defined?(Rails.application)

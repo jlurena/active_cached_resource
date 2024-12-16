@@ -3,8 +3,9 @@
 require "abstract_unit"
 require "fixtures/person"
 require "active_support/log_subscriber/test_helper"
-require "active_resource/log_subscriber"
 require "active_support/core_ext/hash/conversions"
+
+require_relative "../../lib/active_resource/log_subscriber"
 
 class LogSubscriberTest < ActiveSupport::TestCase
   include ActiveSupport::LogSubscriber::TestHelper

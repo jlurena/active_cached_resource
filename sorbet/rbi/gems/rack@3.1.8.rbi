@@ -11,7 +11,7 @@
 # All modules meant for use in your application are <tt>autoload</tt>ed here,
 # so it should be enough just to <tt>require 'rack'</tt> in your code.
 #
-# source://rack//lib/rack/version.rb#14
+# source://rack//lib/rack/bad_request.rb#3
 module Rack
   class << self
     # Return the Rack release as a dotted string.

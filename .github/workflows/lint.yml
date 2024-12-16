@@ -34,16 +34,15 @@ jobs:
       - name: Set up Ruby
         if: steps.changed-files.outputs.any_changed == 'true'
         uses: ruby/setup-ruby@v1.197.0
-        env:
-          BUNDLE_ONLY: ci
         with:
           ruby-version: 3.2.2
           bundler-cache: true
+      - name: Type Check
+        if: steps.changed-files.outputs.any_changed == 'true'
+        run: bundle exec srb tc
       - name: Lint Code
         if: steps.changed-files.outputs.any_changed == 'true'
         uses: wearerequired/lint-action@v2.3.0
-        env:
-          BUNDLE_ONLY: ci
         with:
           auto_fix: true
           rubocop: true

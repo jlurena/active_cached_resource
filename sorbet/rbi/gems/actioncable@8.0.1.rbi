@@ -10,158 +10,158 @@
 # source://actioncable//lib/rails/generators/channel/channel_generator.rb#5
 module Rails
   class << self
-    # source://railties/8.0.0/lib/rails.rb#44
+    # source://railties/8.0.1/lib/rails.rb#44
     def app_class; end
 
-    # source://railties/8.0.0/lib/rails.rb#44
+    # source://railties/8.0.1/lib/rails.rb#44
     def app_class=(_arg0); end
 
-    # source://railties/8.0.0/lib/rails.rb#45
+    # source://railties/8.0.1/lib/rails.rb#45
     def application; end
 
-    # source://railties/8.0.0/lib/rails.rb#43
+    # source://railties/8.0.1/lib/rails.rb#43
     def application=(_arg0); end
 
-    # source://railties/8.0.0/lib/rails.rb#126
+    # source://railties/8.0.1/lib/rails.rb#126
     def autoloaders; end
 
-    # source://railties/8.0.0/lib/rails.rb#56
+    # source://railties/8.0.1/lib/rails.rb#56
     def backtrace_cleaner; end
 
-    # source://railties/8.0.0/lib/rails.rb#44
+    # source://railties/8.0.1/lib/rails.rb#44
     def cache; end
 
-    # source://railties/8.0.0/lib/rails.rb#44
+    # source://railties/8.0.1/lib/rails.rb#44
     def cache=(_arg0); end
 
-    # source://railties/8.0.0/lib/rails.rb#52
+    # source://railties/8.0.1/lib/rails.rb#52
     def configuration; end
 
-    # source://railties/8.0.0/lib/rails/deprecator.rb#4
+    # source://railties/8.0.1/lib/rails/deprecator.rb#4
     def deprecator; end
 
-    # source://railties/8.0.0/lib/rails.rb#75
+    # source://railties/8.0.1/lib/rails.rb#75
     def env; end
 
-    # source://railties/8.0.0/lib/rails.rb#82
+    # source://railties/8.0.1/lib/rails.rb#82
     def env=(environment); end
 
-    # source://railties/8.0.0/lib/rails.rb#93
+    # source://railties/8.0.1/lib/rails.rb#93
     def error; end
 
-    # source://railties/8.0.0/lib/rails/gem_version.rb#5
+    # source://railties/8.0.1/lib/rails/gem_version.rb#5
     def gem_version; end
 
-    # source://railties/8.0.0/lib/rails.rb#106
+    # source://railties/8.0.1/lib/rails.rb#106
     def groups(*groups); end
 
-    # source://railties/8.0.0/lib/rails.rb#49
+    # source://railties/8.0.1/lib/rails.rb#49
     def initialize!(*_arg0, **_arg1, &_arg2); end
 
-    # source://railties/8.0.0/lib/rails.rb#49
+    # source://railties/8.0.1/lib/rails.rb#49
     def initialized?(*_arg0, **_arg1, &_arg2); end
 
-    # source://railties/8.0.0/lib/rails.rb#44
+    # source://railties/8.0.1/lib/rails.rb#44
     def logger; end
 
-    # source://railties/8.0.0/lib/rails.rb#44
+    # source://railties/8.0.1/lib/rails.rb#44
     def logger=(_arg0); end
 
-    # source://railties/8.0.0/lib/rails.rb#122
+    # source://railties/8.0.1/lib/rails.rb#122
     def public_path; end
 
-    # source://railties/8.0.0/lib/rails.rb#65
+    # source://railties/8.0.1/lib/rails.rb#65
     def root; end
 
-    # source://railties/8.0.0/lib/rails/version.rb#7
+    # source://railties/8.0.1/lib/rails/version.rb#7
     def version; end
   end
 end
 
 # source://actioncable//lib/rails/generators/channel/channel_generator.rb#6
 module Rails::Generators
-  # source://railties/8.0.0/lib/rails/generators.rb#27
+  # source://railties/8.0.1/lib/rails/generators.rb#27
   def namespace; end
 
-  # source://railties/8.0.0/lib/rails/generators.rb#27
+  # source://railties/8.0.1/lib/rails/generators.rb#27
   def namespace=(val); end
 
   class << self
-    # source://railties/8.0.0/lib/rails/generators.rb#279
+    # source://railties/8.0.1/lib/rails/generators.rb#279
     def add_generated_file(file); end
 
-    # source://railties/8.0.0/lib/rails/generators.rb#92
+    # source://railties/8.0.1/lib/rails/generators.rb#92
     def after_generate_callbacks; end
 
-    # source://railties/8.0.0/lib/rails/generators.rb#84
+    # source://railties/8.0.1/lib/rails/generators.rb#84
     def aliases; end
 
-    # source://railties/8.0.0/lib/rails/generators.rb#116
+    # source://railties/8.0.1/lib/rails/generators.rb#116
     def api_only!; end
 
-    # source://railties/8.0.0/lib/rails/generators.rb#68
+    # source://railties/8.0.1/lib/rails/generators.rb#68
     def configure!(config); end
 
-    # source://railties/8.0.0/lib/rails/generators.rb#108
+    # source://railties/8.0.1/lib/rails/generators.rb#108
     def fallbacks; end
 
-    # source://railties/8.0.0/lib/rails/generators.rb#234
+    # source://railties/8.0.1/lib/rails/generators.rb#234
     def find_by_namespace(name, base = T.unsafe(nil), context = T.unsafe(nil)); end
 
-    # source://railties/8.0.0/lib/rails/generators.rb#170
+    # source://railties/8.0.1/lib/rails/generators.rb#170
     def help(command = T.unsafe(nil)); end
 
-    # source://railties/8.0.0/lib/rails/generators.rb#134
+    # source://railties/8.0.1/lib/rails/generators.rb#134
     def hidden_namespaces; end
 
-    # source://railties/8.0.0/lib/rails/generators.rb#164
+    # source://railties/8.0.1/lib/rails/generators.rb#164
     def hide_namespace(*namespaces); end
 
-    # source://railties/8.0.0/lib/rails/generators.rb#164
+    # source://railties/8.0.1/lib/rails/generators.rb#164
     def hide_namespaces(*namespaces); end
 
-    # source://railties/8.0.0/lib/rails/generators.rb#261
+    # source://railties/8.0.1/lib/rails/generators.rb#261
     def invoke(namespace, args = T.unsafe(nil), config = T.unsafe(nil)); end
 
-    # source://railties/8.0.0/lib/rails/generators.rb#27
+    # source://railties/8.0.1/lib/rails/generators.rb#27
     def namespace; end
 
-    # source://railties/8.0.0/lib/rails/generators.rb#27
+    # source://railties/8.0.1/lib/rails/generators.rb#27
     def namespace=(val); end
 
-    # source://railties/8.0.0/lib/rails/generators.rb#88
+    # source://railties/8.0.1/lib/rails/generators.rb#88
     def options; end
 
-    # source://railties/8.0.0/lib/rails/generators.rb#192
+    # source://railties/8.0.1/lib/rails/generators.rb#192
     def print_generators; end
 
-    # source://railties/8.0.0/lib/rails/generators.rb#187
+    # source://railties/8.0.1/lib/rails/generators.rb#187
     def public_namespaces; end
 
-    # source://railties/8.0.0/lib/rails/generators.rb#196
+    # source://railties/8.0.1/lib/rails/generators.rb#196
     def sorted_groups; end
 
-    # source://railties/8.0.0/lib/rails/generators.rb#80
+    # source://railties/8.0.1/lib/rails/generators.rb#80
     def templates_path; end
 
     private
 
-    # source://railties/8.0.0/lib/rails/generators.rb#306
+    # source://railties/8.0.1/lib/rails/generators.rb#306
     def command_type; end
 
-    # source://railties/8.0.0/lib/rails/generators.rb#314
+    # source://railties/8.0.1/lib/rails/generators.rb#314
     def file_lookup_paths; end
 
-    # source://railties/8.0.0/lib/rails/generators.rb#291
+    # source://railties/8.0.1/lib/rails/generators.rb#291
     def invoke_fallbacks_for(name, base); end
 
-    # source://railties/8.0.0/lib/rails/generators.rb#310
+    # source://railties/8.0.1/lib/rails/generators.rb#310
     def lookup_paths; end
 
-    # source://railties/8.0.0/lib/rails/generators.rb#285
+    # source://railties/8.0.1/lib/rails/generators.rb#285
     def print_list(base, namespaces); end
 
-    # source://railties/8.0.0/lib/rails/generators.rb#318
+    # source://railties/8.0.1/lib/rails/generators.rb#318
     def run_after_generate_callback; end
   end
 end
@@ -177,7 +177,7 @@ class Rails::Generators::ChannelGenerator < ::Rails::Generators::NamedBase
   # source://thor/1.3.2/lib/thor/base.rb#163
   def actions=(_arg0); end
 
-  # source://railties/8.0.0/lib/rails/generators/named_base.rb#215
+  # source://railties/8.0.1/lib/rails/generators/named_base.rb#215
   def check_class_collision; end
 
   # source://actioncable//lib/rails/generators/channel/channel_generator.rb#18
@@ -246,7 +246,7 @@ class Rails::Generators::ChannelGenerator < ::Rails::Generators::NamedBase
   def using_node?; end
 
   class << self
-    # source://railties/8.0.0/lib/rails/generators/base.rb#194
+    # source://railties/8.0.1/lib/rails/generators/base.rb#194
     def test_framework_generator; end
   end
 end

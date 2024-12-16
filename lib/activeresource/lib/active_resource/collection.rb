@@ -6,7 +6,16 @@ require "active_support/inflector"
 module ActiveResource # :nodoc:
   class Collection # :nodoc:
     include Enumerable
-    delegate :to_yaml, *Array.public_instance_methods(false), to: :request_resources!
+    delegate :==, :[], :&, :*, :+, :-, :<=>, :all?, :any?, :as_json, :at, :assoc, :blank?, :bsearch, :bsearch_index,
+         :collect, :combination, :compact, :count, :cycle, :deconstruct, :deep_dup, :dig, :difference, :drop,
+         :drop_while, :each, :each_index, :empty?, :eql?, :excluding, :filter, :fifth, :find_index, :first,
+         :flatten, :forty_two, :fourth, :from, :hash, :include?, :including, :index, :inspect, :intersect?,
+         :intersection, :join, :last, :length, :map, :max, :min, :minmax, :none?, :one?, :pack, :permutation,
+         :pretty_print_cycle, :present?, :product, :reject, :repeated_combination, :repeated_permutation,
+         :rassoc, :reverse, :reverse_each, :rindex, :rotate, :sample, :second, :second_to_last, :select,
+         :shelljoin, :shuffle, :size, :slice, :sort, :sum, :take, :take_while, :third, :third_to_last, :to,
+         :to_a, :to_ary, :to_fs, :to_formatted_s, :to_h, :to_param, :to_query, :to_s, :to_sentence, :to_xml,
+         :transpose, :union, :uniq, :values_at, :without, :zip, to: :request_resources!
 
     attr_accessor :resource_class, :query_params, :path_params
     attr_writer :prefix_options
@@ -173,6 +182,10 @@ module ActiveResource # :nodoc:
       raise ArgumentError, "expected a clauses Hash, got #{clauses.inspect}" unless clauses.is_a? Hash
       new_clauses = query_params.merge(clauses)
       resource_class.where(new_clauses)
+    end
+
+    def each(&block)
+      request_resources!.each(&block)
     end
 
     private

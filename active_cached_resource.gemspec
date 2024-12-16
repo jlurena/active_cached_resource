@@ -37,11 +37,4 @@ Gem::Specification.new do |spec|
   spec.add_dependency "activemodel", ">= 6.0"
   spec.add_dependency "activesupport", ">= 6.0"
   spec.add_dependency "msgpack", "~> 1.7", ">= 1.7.5"
-
-  spec.add_development_dependency "activejob", ">= 6.0"
-  spec.add_development_dependency "activerecord", ">= 6.0"
-  spec.add_development_dependency "mocha", ">= 0.13.0"
-  spec.add_development_dependency "rake", "~> 13.2", ">= 13.2.1"
-  spec.add_development_dependency "rexml"
-  spec.add_development_dependency "sqlite3", "~> 2.3", ">= 2.3.1"
 end

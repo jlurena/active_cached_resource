@@ -7,12 +7,13 @@ lib = File.expand_path("#{File.dirname(__FILE__)}/../lib")
 $:.unshift(lib) unless $:.include?("lib") || $:.include?(lib)
 
 require "minitest/autorun"
-require "active_resource"
 require "active_support"
 require "active_support/test_case"
 require "setter_trap"
 require "active_support/logger"
 require "base64"
+
+require_relative "../lib/active_resource"
 
 ActiveSupport::TestCase.test_order = :random if ActiveSupport::TestCase.respond_to?(:test_order=)
 ActiveResource::Base.logger = ActiveSupport::Logger.new("#{File.dirname(__FILE__)}/debug.log")

@@ -1,5 +1,6 @@
 require "active_record"
 require "sqlite3"
+require "spec_helper"
 
 class TestResource < ActiveResource::Base
   self.site = "https://api.example.com"

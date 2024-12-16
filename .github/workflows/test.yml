@@ -8,6 +8,8 @@ concurrency:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      BUNDLE_WITHOUT: 'versioning:development'
     strategy:
       fail-fast: false
       matrix:
@@ -31,5 +33,5 @@ jobs:
         uses: SonicGarden/rspec-report-action@v5
         with:
           json-path: tmp/json-reports/rspec_results-ruby${{ matrix.ruby }}.json
-          title: RSpec Report - Ruby ${{ matrix.ruby }}
+          title: ':cold_sweat: Failed Tests for Ruby:${{ matrix.ruby }}'
         if: always()

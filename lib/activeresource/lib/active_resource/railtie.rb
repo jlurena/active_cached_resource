@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "active_resource"
+require_relative "../active_resource"
 require "rails"
 
 module ActiveResource
@@ -17,7 +17,7 @@ module ActiveResource
 
     initializer "active_resource.add_active_job_serializer" do |app|
       if app.config.try(:active_job).try(:custom_serializers)
-        require "active_resource/active_job_serializer"
+        require_relative "../active_resource/active_job_serializer"
         app.config.active_job.custom_serializers << ActiveResource::ActiveJobSerializer
       end
     end
