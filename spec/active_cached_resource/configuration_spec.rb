@@ -17,7 +17,7 @@ RSpec.describe ActiveCachedResource::Configuration do
         expect(config.cache_key_prefix).to eq("test_resource")
         expect(config.logger).to eq(logger)
         expect(config.enabled).to be true
-        expect(config.ttl).to eq(86400)
+        expect(config.ttl).to eq(1)
       end
     end
 
