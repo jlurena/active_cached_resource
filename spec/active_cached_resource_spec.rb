@@ -5,7 +5,7 @@ class TestResource < ActiveResource::Base
 
   setup_cached_resource!(
     cache_store: ActiveSupport::Cache::MemoryStore.new,
-    cache_strategy: :active_support,
+    cache_strategy: :active_support_cache,
     ttl: 10.minutes,
     logger: Logger.new(IO::NULL)
   )

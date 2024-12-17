@@ -4,7 +4,7 @@ require_relative "lib/active_cached_resource/version"
 
 Gem::Specification.new do |spec|
   spec.name = "active_cached_resource"
-  spec.version = ActiveCachedResource::VERSION::STRING
+  spec.version = ActiveCachedResource::VERSION
   spec.authors = ["Jean Luis Urena"]
   spec.email = ["eljean@live.com"]
 
@@ -20,15 +20,17 @@ Gem::Specification.new do |spec|
     "wiki_uri" => "https://github.com/jlurena/active_cached_resource/wiki"
   }
 
-  # Specify which files should be added to the gem when it is released.
-  # The `git ls-files -z` loads the files in the RubyGem that have been added into git.
-  gemspec = File.basename(__FILE__)
-  spec.files = IO.popen(%w[git ls-files -z], chdir: __dir__, err: IO::NULL) do |ls|
-    ls.readlines("\x0", chomp: true).reject do |f|
-      (f == gemspec) ||
-        f.start_with?(*%w[bin/ test/ spec/ features/ .git appveyor Gemfile])
-    end
-  end
+  spec.files = [
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md",
+    "lib/active_cached_resource.rb",
+    *Dir.glob("lib/active_cached_resource/**/*"),
+    *Dir.glob("lib/activeresource/lib/**/*"),
+    "lib/activeresource/README.md",
+    *Dir.glob("lib/generators/**/*")
+  ]
+
   spec.bindir = "exe"
   spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]

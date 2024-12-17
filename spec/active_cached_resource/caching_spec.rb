@@ -55,7 +55,7 @@ RSpec.describe ActiveCachedResource::Caching do
   before do
     TestResource.setup_cached_resource!(
       cache_store: cache_store,
-      cache_strategy: :active_support,
+      cache_strategy: :active_support_cache,
       logger: logger,
       ttl: 10.minutes
     )
