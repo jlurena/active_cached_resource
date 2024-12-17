@@ -1,0 +1,2 @@
+--exclude lib/activeresource/test
+--exclude lib/activeresource/examples

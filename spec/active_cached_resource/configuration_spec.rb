@@ -10,7 +10,7 @@ RSpec.describe ActiveCachedResource::Configuration do
   describe "#initialize" do
     context "with a valid cache_store and cache_strategy" do
       it "initializes with the specified caching strategy" do
-        config = described_class.new(model, cache_store: cache_store, cache_strategy: :active_support)
+        config = described_class.new(model, cache_store: cache_store, cache_strategy: :active_support_cache)
 
         expect(config.cache).to be_a(ActiveCachedResource::CachingStrategies::ActiveSupportCache)
         expect(config.cache.instance_variable_get(:@cache_store)).to eq(cache_store)
@@ -48,7 +48,7 @@ RSpec.describe ActiveCachedResource::Configuration do
         config = described_class.new(
           model,
           cache_store: cache_store,
-          cache_strategy: :active_support,
+          cache_strategy: :active_support_cache,
           cache_key_prefix: "custom_prefix",
           enabled: false,
           ttl: 3600
@@ -63,7 +63,7 @@ RSpec.describe ActiveCachedResource::Configuration do
 
   describe "#on!" do
     it "enables caching" do
-      config = described_class.new(model, cache_store: cache_store, cache_strategy: :active_support)
+      config = described_class.new(model, cache_store: cache_store, cache_strategy: :active_support_cache)
       config.off!
 
       expect(config.enabled).to be false
@@ -75,7 +75,7 @@ RSpec.describe ActiveCachedResource::Configuration do
 
   describe "#off!" do
     it "disables caching" do
-      config = described_class.new(model, cache_store: cache_store, cache_strategy: :active_support)
+      config = described_class.new(model, cache_store: cache_store, cache_strategy: :active_support_cache)
 
       config.off!
       expect(config.enabled).to be false

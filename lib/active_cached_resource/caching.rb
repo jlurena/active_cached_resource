@@ -13,6 +13,105 @@ module ActiveCachedResource
     end
 
     module ClassMethods
+      # Finds resources similarly to ActiveRecord's +find+ method, with caching support.
+      #
+      # This method is also called internally by the `where` method. When you use `where` to filter results,
+      # it translates the query conditions into parameters and delegates to this method.
+      #
+      # Depending on the first argument provided, this method retrieves:
+      #
+      # * `:one`  - A single resource.
+      # * `:first` - The first resource in the result set.
+      # * `:last`  - The last resource in the result set.
+      # * `:all`   - An array of all matching resources.
+      #
+      # If an Integer or String ID is provided instead of a symbol, it attempts to find a single resource by that ID.
+      #
+      # @overload find_with_cache(scope, options = {})
+      #   @param scope [Symbol, Integer, String]
+      #     The scope of the query or the ID of the resource to find.
+      #     Can be `:one`, `:first`, `:last`, `:all`, or a specific ID.
+      #   @param options [Hash] Additional query options.
+      #   @option options [String, Symbol] :from
+      #     The path or custom endpoint from which to fetch resources.
+      #   @option options [Hash] :params
+      #     Query and prefix (nested URL) parameters.
+      #
+      # @return [Object, Array<Object>, nil]
+      #   * Returns a single resource object if `:one`, `:first`, `:last`, or an ID is given.
+      #   * Returns an array of resources if `:all` is given.
+      #   * Returns `nil` if no data is found for `:one`, `:first`, `:last`, or `:all` queries.
+      #
+      # @raise [ResourceNotFound]
+      #   Raises if the requested resource by ID cannot be found.
+      #
+      # @note
+      #   If the `:reload` option is passed (e.g. `:reload => true`), the cache will be bypassed, and
+      #   the resource(s) will be fetched directly from the server.
+      #
+      # @example Find a single resource by ID
+      #   Person.find(1)
+      #   # GET /people/1.json
+      #
+      # @example Find all resources
+      #   Person.find(:all)
+      #   # GET /people.json
+      #
+      # @example Find all resources with query parameters
+      #   Person.find(:all, params: { title: "CEO" })
+      #   # GET /people.json?title=CEO
+      #
+      # @example Find the first resource from a custom endpoint
+      #   Person.find(:first, from: :managers)
+      #   # GET /people/managers.json
+      #
+      # @example Find the last resource from a custom endpoint
+      #   Person.find(:last, from: :managers)
+      #   # GET /people/managers.json
+      #
+      # @example Find all resources from a nested URL
+      #   Person.find(:all, from: "/companies/1/people.json")
+      #   # GET /companies/1/people.json
+      #
+      # @example Find a single resource from a custom endpoint
+      #   Person.find(:one, from: :leader)
+      #   # GET /people/leader.json
+      #
+      # @example Find all developers speaking Ruby
+      #   Person.find(:all, from: :developers, params: { language: 'ruby' })
+      #   # GET /people/developers.json?language=ruby
+      #
+      # @example Find a single resource from a nested URL
+      #   Person.find(:one, from: "/companies/1/manager.json")
+      #   # GET /companies/1/manager.json
+      #
+      # @example Find a resource with nested prefix parameters
+      #   StreetAddress.find(1, params: { person_id: 1 })
+      #   # GET /people/1/street_addresses/1.json
+      #
+      # When `where` is used, it automatically builds the query parameters and calls `find_with_cache(:all, ...)`:
+      #
+      # @example Using `where` with parameters
+      #   Person.where(title: "CEO")
+      #   # Under the hood: Person.find_with_cache(:all, params: { title: "CEO" })
+      #   # => GET /people.json?title=CEO
+      #
+      #   Person.where(language: 'ruby').where(from: :developers)
+      #   # Under the hood: Person.find_with_cache(:all, from: :developers, params: { language: 'ruby' })
+      #   # => GET /people/developers.json?language=ruby
+      #
+      # == Failure or missing data
+      # A failure to find the requested object by ID raises a ResourceNotFound exception.
+      # With any other scope, find returns nil when no data is returned.
+      #
+      #   Person.find(1)
+      #   # => raises ResourceNotFound
+      #
+      #   Person.find(:all)
+      #   Person.find(:first)
+      #   Person.find(:last)
+      #   # => nil
+      #
       def find_with_cache(*orig_args)
         args = orig_args.deep_dup # Avoid mutating original arguments
         options = extract_options(*args)
@@ -35,7 +134,11 @@ module ActiveCachedResource
         should_reload ? find_via_reload(*args) : find_via_cache(*args)
       end
 
-      # Clear the cache.
+      # Clears all cache matching the cache key prefix of the model.
+      #
+      # This method clears all cached entries that match the cache key prefix.
+      #
+      # @return [void]
       def clear
         cached_resource.cache.clear("#{cache_key_prefix}/")
       end
