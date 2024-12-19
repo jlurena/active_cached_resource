@@ -69,6 +69,8 @@ module ActiveResource # :nodoc:
       @from = from
       @elements = elements
       @requested = false
+      @query_params = {}
+      @path_params = {}
       # This can get called without a response, so parse only if response is present
       parse_response(@elements) if @elements.present?
     end
