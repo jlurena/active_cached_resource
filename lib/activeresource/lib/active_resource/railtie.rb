@@ -21,11 +21,5 @@ module ActiveResource
         app.config.active_job.custom_serializers << ActiveResource::ActiveJobSerializer
       end
     end
-
-    initializer "active_resource.deprecator" do |app|
-      if app.respond_to?(:deprecators)
-        app.deprecators[:active_resource] = ActiveResource.deprecator
-      end
-    end
   end
 end
