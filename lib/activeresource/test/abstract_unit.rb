@@ -1,10 +1,17 @@
 # frozen_string_literal: true
 
+require "dotenv/load"
+require "pry-byebug"
 require "rubygems" unless defined? Gem
 require "bundler/setup"
 
 lib = File.expand_path("#{File.dirname(__FILE__)}/../lib")
 $:.unshift(lib) unless $:.include?("lib") || $:.include?(lib)
+
+if ENV["CI"]
+  require "minitest/reporters"
+  Minitest::Reporters.use! Minitest::Reporters::JUnitReporter.new(ENV.fetch("JUNIT_REPORTS_PATH"), false)
+end
 
 require "minitest/autorun"
 require "active_support"

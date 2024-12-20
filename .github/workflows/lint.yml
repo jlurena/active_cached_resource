@@ -1,6 +1,5 @@
 name: Lint
 on:
-  workflow_dispatch:
   workflow_call:
 concurrency:
   group: ${{ github.ref }}-${{ github.workflow }}-lint
@@ -8,9 +7,6 @@ concurrency:
 jobs:
   lint:
     runs-on: ubuntu-latest
-    permissions:
-      checks: write
-      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4

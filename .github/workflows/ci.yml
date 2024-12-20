@@ -11,8 +11,11 @@ jobs:
     permissions:
       checks: write
       contents: write
+      pull-requests: write
     uses: ./.github/workflows/lint.yml
   test:
     permissions:
+      contents: read
+      checks: write
       pull-requests: write
     uses: ./.github/workflows/test.yml

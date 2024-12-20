@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
+require "dotenv/load"
 require "msgpack"
 require "pry-byebug"
+
 require "simplecov"
 
 Dir.glob(File.join(__dir__, "support", "**", "*.rb")).each { |f| require_relative f }
@@ -9,6 +11,7 @@ Dir.glob(File.join(__dir__, "support", "**", "*.rb")).each { |f| require_relativ
 SimpleCov.start do
   add_filter "/spec/"
   add_filter "/example/"
+  add_filter "/lib/active_resource/"
 end
 require "active_cached_resource"
 

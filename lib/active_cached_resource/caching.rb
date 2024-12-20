@@ -1,3 +1,5 @@
+require_relative "collection"
+
 module ActiveCachedResource
   module Caching
     GLOBAL_PREFIX = "acr"
@@ -9,6 +11,10 @@ module ActiveCachedResource
       class << self
         alias_method :find_without_cache, :find
         alias_method :find, :find_with_cache
+
+        def collection_parser
+          _collection_parser || ActiveCachedResource::Collection
+        end
       end
     end
 
@@ -119,7 +125,7 @@ module ActiveCachedResource
         should_reload = options.delete(:reload) || !cached_resource.enabled
 
         # When bypassing cache, include the reload option as a query parameter for collection requests.
-        # Hacky but this way ActiveResource::Collection#request_resources! can access it
+        # Hacky but this way ActiveCachedResource::Collection#request_resources! can access it
         if should_reload && args.first == :all
           options[:params] = {} if options[:params].blank?
           options[:params][RELOAD_PARAM] = should_reload
@@ -127,7 +133,7 @@ module ActiveCachedResource
         end
 
         if args.first == :all
-          # Let ActiveResource::Collection handle the caching so that lazy loading is more effective
+          # Let ActiveCachedResource::Collection handle the caching so that lazy loading is more effective
           return find_via_reload(*args)
         end
 
@@ -189,16 +195,16 @@ module ActiveCachedResource
 
       # Determines if the given object should be cached.
       #
-      # @param object [Object, ActiveResource::Collection] The object to check for caching eligibility.
+      # @param object [Object, ActiveCachedResource::Collection] The object to check for caching eligibility.
       # @return [Boolean] Returns true if the object should be cached, false otherwise.
       def should_cache?(object)
         return false unless cached_resource.enabled
 
         # Calling `present?` on the `collection_parser`, an instance or descendent of
-        # `ActiveResource::Collection` will trigger a request.
+        # `ActiveCachedResource::Collection` will trigger a request.
         # Checking if `requested?` first, will prevent an unnecessary network request when calling `present?`.
         case object
-        when ActiveResource::Collection
+        when ActiveCachedResource::Collection
           object.requested? && object.present?
         else
           object.present?

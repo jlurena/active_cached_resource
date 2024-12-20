@@ -1,6 +1,5 @@
 name: Test
 on:
-  workflow_dispatch:
   workflow_call:
 concurrency:
   group: ${{ github.ref }}-${{ github.workflow }}-test
@@ -19,19 +18,31 @@ jobs:
           - ruby: head
     steps:
       - uses: actions/checkout@v4
+      - name: Load dotenv into workflow
+        id: dotenv
+        uses: falti/dotenv-action@v1.1.4
+        with:
+          keys-case: bypass
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
-      - name: Test
+      - name: Test ActiveCachedResource
+        id: active-cached-resource-test
+        continue-on-error: true
         run: |
           bundle exec rspec \
-            -f j -o tmp/json-reports/rspec_results-ruby${{ matrix.ruby }}.json \
-            -f p
-      - name: RSpec Report
-        uses: SonicGarden/rspec-report-action@v5
+            -f RspecJunitFormatter -o ${{ steps.dotenv.outputs.JUNIT_REPORTS_PATH }}/rspec_ruby${{ matrix.ruby }}.xml
+      - name: Test ActiveResource
+        continue-on-error: true
+        id: active-resource-test
+        run: |
+          bundle exec rake active_resource_test
+      - name: Publish Test Report
+        uses: mikepenz/action-junit-report@v5.2.0
         with:
-          json-path: tmp/json-reports/rspec_results-ruby${{ matrix.ruby }}.json
-          title: ':cold_sweat: Failed Tests for Ruby:${{ matrix.ruby }}'
-        if: always()
+          report_paths: '${{ steps.dotenv.outputs.JUNIT_REPORTS_PATH }}/**/*.xml'
+          check_name: 'Test Result for Ruby:${{ matrix.ruby }}'
+          fail_on_failure: true
+          comment: true
