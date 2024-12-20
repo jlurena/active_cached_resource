@@ -13,7 +13,7 @@ unless ENV["CI"]
   RuboCop::RakeTask.new(:rubocop)
 
   # ActiveResource tests
-  Rake::TestTask.new(:ar_tests) do |t|
+  Rake::TestTask.new(:active_resource_test) do |t|
     t.libs = ["lib/activeresource/test"]
     t.pattern = "lib/activeresource/test/**/*_test.rb"
     t.warning = true
@@ -25,5 +25,5 @@ unless ENV["CI"]
     sh "srb tc"
   end
 
-  task default: [:tc, :rubocop, :spec, :ar_tests]
+  task default: [:tc, :rubocop, :spec, :active_resource_test]
 end

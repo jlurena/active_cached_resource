@@ -202,7 +202,7 @@ module ActiveResource # :nodoc:
       #
       # [Array<Object>] The collection of resources retrieved from the API.
       def request_resources!
-        return @elements if requested?
+        return @elements if requested? || resource_class.nil?
         response =
           case from
           when Symbol

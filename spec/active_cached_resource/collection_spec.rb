@@ -11,7 +11,7 @@ class TestResource < ActiveResource::Base
   )
 end
 
-RSpec.describe ActiveResource::Collection do
+RSpec.describe ActiveCachedResource::Collection do
   it "has a version number" do
     expect(ActiveCachedResource::VERSION).not_to be nil
   end

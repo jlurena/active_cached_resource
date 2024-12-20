@@ -7,7 +7,7 @@ require_relative "caching_strategies/base"
 module ActiveCachedResource
   class Configuration < OpenStruct
     CACHING_STRATEGIES = {
-      active_record: ActiveCachedResource::CachingStrategies::SQLCache,
+      active_record_sql: ActiveCachedResource::CachingStrategies::SQLCache,
       active_support_cache: ActiveCachedResource::CachingStrategies::ActiveSupportCache
     }
 
@@ -18,7 +18,7 @@ module ActiveCachedResource
     # @param model [Class] The model class for which the configuration is being set.
     # @param options [Hash] A hash of options to customize the configuration.
     # @option options [Symbol] :cache_store The cache store to be used.
-    # @option options [Symbol] :cache_strategy The cache strategy to be used. One of :active_record or :active_support_cache.
+    # @option options [Symbol] :cache_strategy The cache strategy to be used. One of :active_record_sql or :active_support_cache.
     # @option options [String] :cache_key_prefix The prefix for cache keys (default: model name underscored).
     # @option options [Logger] :logger The logger instance to be used (default: ActiveCachedResource::Logger).
     # @option options [Boolean] :enabled Whether caching is enabled (default: true).

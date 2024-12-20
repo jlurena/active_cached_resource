@@ -2,6 +2,7 @@
 
 source "https://rubygems.org"
 
+gem "dotenv", "~> 3.1", ">= 3.1.7"
 gem "rake", "~> 13.2", ">= 13.2.1"
 
 group :versioning do
@@ -27,7 +28,9 @@ group :development, :test do
 end
 
 group :test do
+  gem "minitest-reporters", "~> 1.7", ">= 1.7.1"
   gem "mocha", ">= 0.13.0"
+  gem "rspec_junit_formatter", "~> 0.6.0"
   gem "rspec", "~> 3.13"
   gem "simplecov", "~> 0.22.0", require: false
 end

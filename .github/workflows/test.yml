@@ -19,6 +19,8 @@ jobs:
           - ruby: head
     steps:
       - uses: actions/checkout@v4
+      - name: Load dotenv into workflow
+        uses: falti/dotenv-action@v1.1.4
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
@@ -27,11 +29,16 @@ jobs:
       - name: Test
         run: |
           bundle exec rspec \
-            -f j -o tmp/json-reports/rspec_results-ruby${{ matrix.ruby }}.json \
-            -f p
-      - name: RSpec Report
-        uses: SonicGarden/rspec-report-action@v5
-        with:
-          json-path: tmp/json-reports/rspec_results-ruby${{ matrix.ruby }}.json
-          title: ':cold_sweat: Failed Tests for Ruby:${{ matrix.ruby }}'
+            -f RspecJunitFormatter -o ${{ steps.dotenv.outputs.JUNIT_REPORTS_PATH }}/rspec_ruby${{ matrix.ruby }}.xml
+      - name: Test ActiveResource
         if: always()
+        run: |
+          bundle exec rake active_resource_test
+      - name: Publish Test Report
+        uses: mikepenz/action-junit-report@v5.2.0
+        if: always()
+        with:
+          report_paths: '${{ steps.dotenv.outputs.JUNIT_REPORTS_PATH }}/**/*.xml'
+          check_name: ':cold_sweat: Failed Tests for Ruby:${{ matrix.ruby }}'
+          fail_on_failure: true
+          comment: true

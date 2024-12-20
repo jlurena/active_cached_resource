@@ -2830,6 +2830,198 @@ module Rake::TaskManager
   end
 end
 
+# Create a task that runs a set of tests.
+#
+# Example:
+#   require "rake/testtask"
+#
+#   Rake::TestTask.new do |t|
+#     t.libs << "test"
+#     t.test_files = FileList['test/test*.rb']
+#     t.verbose = true
+#   end
+#
+# If rake is invoked with a "TEST=filename" command line option,
+# then the list of test files will be overridden to include only the
+# filename specified on the command line.  This provides an easy way
+# to run just one test.
+#
+# If rake is invoked with a "TESTOPTS=options" command line option,
+# then the given options are passed to the test process after a
+# '--'.  This allows Test::Unit options to be passed to the test
+# suite.
+#
+# Examples:
+#
+#   rake test                           # run tests normally
+#   rake test TEST=just_one_file.rb     # run just one test file.
+#   rake test TESTOPTS="-v"             # run in verbose mode
+#   rake test TESTOPTS="--runner=fox"   # use the fox test runner
+#
+# source://rake//lib/rake/testtask.rb#35
+class Rake::TestTask < ::Rake::TaskLib
+  # Create a testing task.
+  #
+  # @return [TestTask] a new instance of TestTask
+  # @yield [_self]
+  # @yieldparam _self [Rake::TestTask] the object that the method was called on
+  #
+  # source://rake//lib/rake/testtask.rb#86
+  def initialize(name = T.unsafe(nil)); end
+
+  # Create the tasks defined by this task lib.
+  #
+  # source://rake//lib/rake/testtask.rb#108
+  def define; end
+
+  # Task prerequisites.
+  #
+  # source://rake//lib/rake/testtask.rb#75
+  def deps; end
+
+  # Task prerequisites.
+  #
+  # source://rake//lib/rake/testtask.rb#75
+  def deps=(_arg0); end
+
+  # Description of the test task. (default is 'Run tests')
+  #
+  # source://rake//lib/rake/testtask.rb#72
+  def description; end
+
+  # Description of the test task. (default is 'Run tests')
+  #
+  # source://rake//lib/rake/testtask.rb#72
+  def description=(_arg0); end
+
+  # source://rake//lib/rake/testtask.rb#162
+  def file_list; end
+
+  # source://rake//lib/rake/testtask.rb#158
+  def file_list_string; end
+
+  # source://rake//lib/rake/testtask.rb#154
+  def lib_path; end
+
+  # List of directories added to $LOAD_PATH before running the
+  # tests. (default is 'lib')
+  #
+  # source://rake//lib/rake/testtask.rb#42
+  def libs; end
+
+  # List of directories added to $LOAD_PATH before running the
+  # tests. (default is 'lib')
+  #
+  # source://rake//lib/rake/testtask.rb#42
+  def libs=(_arg0); end
+
+  # Style of test loader to use.  Options are:
+  #
+  # * :rake -- Rake provided test loading script (default).
+  # * :testrb -- Ruby provided test loading script.
+  # * :direct -- Load tests using command line loader.
+  #
+  # source://rake//lib/rake/testtask.rb#66
+  def loader; end
+
+  # Style of test loader to use.  Options are:
+  #
+  # * :rake -- Rake provided test loading script (default).
+  # * :testrb -- Ruby provided test loading script.
+  # * :direct -- Load tests using command line loader.
+  #
+  # source://rake//lib/rake/testtask.rb#66
+  def loader=(_arg0); end
+
+  # Name of test task. (default is :test)
+  #
+  # source://rake//lib/rake/testtask.rb#38
+  def name; end
+
+  # Name of test task. (default is :test)
+  #
+  # source://rake//lib/rake/testtask.rb#38
+  def name=(_arg0); end
+
+  # source://rake//lib/rake/testtask.rb#138
+  def option_list; end
+
+  # Test options passed to the test suite.  An explicit
+  # TESTOPTS=opts on the command line will override this. (default
+  # is NONE)
+  #
+  # source://rake//lib/rake/testtask.rb#50
+  def options; end
+
+  # Test options passed to the test suite.  An explicit
+  # TESTOPTS=opts on the command line will override this. (default
+  # is NONE)
+  #
+  # source://rake//lib/rake/testtask.rb#50
+  def options=(_arg0); end
+
+  # Glob pattern to match test files. (default is 'test/test*.rb')
+  #
+  # source://rake//lib/rake/testtask.rb#58
+  def pattern; end
+
+  # Glob pattern to match test files. (default is 'test/test*.rb')
+  #
+  # source://rake//lib/rake/testtask.rb#58
+  def pattern=(_arg0); end
+
+  # Array of command line options to pass to ruby when running test loader.
+  #
+  # source://rake//lib/rake/testtask.rb#69
+  def ruby_opts; end
+
+  # Array of command line options to pass to ruby when running test loader.
+  #
+  # source://rake//lib/rake/testtask.rb#69
+  def ruby_opts=(_arg0); end
+
+  # source://rake//lib/rake/testtask.rb#147
+  def ruby_opts_string; end
+
+  # source://rake//lib/rake/testtask.rb#173
+  def ruby_version; end
+
+  # source://rake//lib/rake/testtask.rb#177
+  def run_code; end
+
+  # Explicitly define the list of test files to be included in a
+  # test.  +list+ is expected to be an array of file names (a
+  # FileList is acceptable).  If both +pattern+ and +test_files+ are
+  # used, then the list of test files is the union of the two.
+  #
+  # source://rake//lib/rake/testtask.rb#81
+  def test_files=(list); end
+
+  # True if verbose test output desired. (default is false)
+  #
+  # source://rake//lib/rake/testtask.rb#45
+  def verbose; end
+
+  # True if verbose test output desired. (default is false)
+  #
+  # source://rake//lib/rake/testtask.rb#45
+  def verbose=(_arg0); end
+
+  # Request that the tests be run with the warning flag set.
+  # E.g. warning=true implies "ruby -w" used to run the tests.
+  # (default is true)
+  #
+  # source://rake//lib/rake/testtask.rb#55
+  def warning; end
+
+  # Request that the tests be run with the warning flag set.
+  # E.g. warning=true implies "ruby -w" used to run the tests.
+  # (default is true)
+  #
+  # source://rake//lib/rake/testtask.rb#55
+  def warning=(_arg0); end
+end
+
 # source://rake//lib/rake/thread_history_display.rb#6
 class Rake::ThreadHistoryDisplay
   include ::Rake::PrivateReader
