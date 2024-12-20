@@ -2,8 +2,6 @@ module ActiveCachedResource
   class Collection < ActiveResource::Collection
     private
 
-    # Monkey patch ActiveResource::Collection to handle caching
-    # @see lib/activeresource/lib/active_resource/collection.rb
     def request_resources!
       return @elements if requested? || resource_class.nil?
 
