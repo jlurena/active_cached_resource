@@ -8,8 +8,10 @@ require "bundler/setup"
 lib = File.expand_path("#{File.dirname(__FILE__)}/../lib")
 $:.unshift(lib) unless $:.include?("lib") || $:.include?(lib)
 
-require "minitest/reporters"
-Minitest::Reporters.use! Minitest::Reporters::JUnitReporter.new(ENV.fetch("JUNIT_REPORTS_PATH"))
+if ENV["CI"]
+  require "minitest/reporters"
+  Minitest::Reporters.use! Minitest::Reporters::JUnitReporter.new(ENV.fetch("JUNIT_REPORTS_PATH"), false)
+end
 
 require "minitest/autorun"
 require "active_support"

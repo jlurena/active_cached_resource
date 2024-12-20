@@ -1,6 +1,5 @@
 name: Test
 on:
-  workflow_dispatch:
   workflow_call:
 concurrency:
   group: ${{ github.ref }}-${{ github.workflow }}-test
@@ -29,21 +28,21 @@ jobs:
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
-      - name: Test
+      - name: Test ActiveCachedResource
+        id: active-cached-resource-test
+        continue-on-error: true
         run: |
           bundle exec rspec \
             -f RspecJunitFormatter -o ${{ steps.dotenv.outputs.JUNIT_REPORTS_PATH }}/rspec_ruby${{ matrix.ruby }}.xml
       - name: Test ActiveResource
-        if: always()
+        continue-on-error: true
+        id: active-resource-test
         run: |
           bundle exec rake active_resource_test
       - name: Publish Test Report
         uses: mikepenz/action-junit-report@v5.2.0
-        id: test-report
-        if: always()
         with:
           report_paths: '${{ steps.dotenv.outputs.JUNIT_REPORTS_PATH }}/**/*.xml'
-          check_name: ':cold_sweat: Failed Tests for Ruby:${{ matrix.ruby }}'
+          check_name: 'Test Result for Ruby:${{ matrix.ruby }}'
           fail_on_failure: true
-          comment: ${{ steps.test-report.outputs.failed > 0 }}
-          include_passed: false
+          comment: true

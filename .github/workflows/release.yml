@@ -22,6 +22,9 @@ jobs:
       contents: write
     uses: ./.github/workflows/lint.yml
   test:
+    permissions:
+      contents: read
+      checks: write
     needs: [ensure_main_branch]
     uses: ./.github/workflows/test.yml
   version:
@@ -67,7 +70,7 @@ jobs:
       BUNDLE_WITHOUT: 'versioning:development:test'
     permissions:
       id-token: write
-      contents: write
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4

@@ -13,7 +13,7 @@ end
 
 RSpec.describe ActiveCachedResource::Collection do
   it "has a version number" do
-    expect(ActiveCachedResource::VERSION).not_to be nil
+    expect(ActiveCachedResource::VERSION).be nil
   end
 
   describe "#request_resources!" do
