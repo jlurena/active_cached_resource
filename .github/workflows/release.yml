@@ -65,7 +65,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       BUNDLE_WITHOUT: 'versioning:development:test'
-      CI: true
     permissions:
       id-token: write
       contents: write

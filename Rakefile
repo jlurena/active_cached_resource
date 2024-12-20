@@ -3,7 +3,7 @@
 require "bundler"
 require "bundler/gem_tasks"
 
-unless ENV["CI"]
+if (Bundler.definition.groups - Bundler.settings[:without] + Bundler.settings[:with]).include?(:test)
   require "rake/testtask"
   require "rspec/core/rake_task"
   require "rubocop/rake_task"
