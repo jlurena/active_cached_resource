@@ -21,7 +21,7 @@ RSpec.describe ActiveCachedResource::Collection do
 
     before do
       ActiveResource::HttpMock.reset!
-      TestResource.clear
+      TestResource.clear_cache
     end
 
     # Helpers

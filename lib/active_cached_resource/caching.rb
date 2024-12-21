@@ -145,7 +145,7 @@ module ActiveCachedResource
       # This method clears all cached entries that match the cache key prefix.
       #
       # @return [void]
-      def clear
+      def clear_cache
         cached_resource.cache.clear("#{cache_key_prefix}/")
       end
 
