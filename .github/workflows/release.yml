@@ -70,12 +70,13 @@ jobs:
       BUNDLE_WITHOUT: 'versioning:development:test'
     permissions:
       id-token: write
-      contents: read
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           ref: main
+          ssh-key: ${{ secrets.DEPLOY_KEY }}
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1.197.0
         with:
