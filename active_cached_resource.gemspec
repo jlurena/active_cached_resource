@@ -11,6 +11,7 @@ Gem::Specification.new do |spec|
   spec.summary = "ActiveResource, but with a caching layer."
   spec.homepage = "https://github.com/jlurena/active_cached_resource"
   spec.required_ruby_version = ">= 3.2.0"
+  spec.platform = Gem::Platform::RUBY
 
   spec.metadata = {
     "changelog_uri" => "https://github.com/jlurena/active_cached_resource/blob/main/CHANGELOG.md",

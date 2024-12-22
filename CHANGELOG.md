@@ -4,6 +4,7 @@
     - Runs tests from ActiveResource
 - Separated Collection caching logic into ActiveCachedResource::Collection as opposed to monkey patching ActiveResource::Collection
 - Changed name of SQL adapter from `active_record` to `active_record_sql`
+- Changed method name of ActiveCachedResource::Model from `clear` to `clear_cache`
 
 ## [0.1.3] - 2024-12-19
 - Minor patch on ActiveResource. Removed deprecator log.
