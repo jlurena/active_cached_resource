@@ -24,7 +24,6 @@ class PeopleController < ApplicationController
   # Create expects an empty response with 201 status and a Location header
   # @see https://github.com/rails/activeresource#update
   def create
-    binding.pry
     person = Person.new(person_params)
     if person.save
       head :created, location: person_url(person)
