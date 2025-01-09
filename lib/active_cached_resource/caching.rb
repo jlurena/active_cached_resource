@@ -140,13 +140,13 @@ module ActiveCachedResource
         should_reload ? find_via_reload(*args) : find_via_cache(*args)
       end
 
-      # Clears all cache matching the cache key prefix of the model.
+      # Clears the cache for the specified pattern.
       #
-      # This method clears all cached entries that match the cache key prefix.
-      #
+      # @param pattern [String, nil] The pattern to match cache keys against.
+      #  If nil, all cache keys with this models prefix will be cleared.
       # @return [void]
-      def clear_cache
-        cached_resource.cache.clear("#{cache_key_prefix}/")
+      def clear_cache(pattern = nil)
+        cached_resource.cache.clear("#{cache_key_prefix}/#{pattern}")
       end
 
       private

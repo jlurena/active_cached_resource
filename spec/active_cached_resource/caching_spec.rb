@@ -43,6 +43,7 @@ RSpec.describe ActiveCachedResource::Caching do
   let(:mock_single_resource) do
     ActiveResource::HttpMock.respond_to do |mock|
       mock.get "/test_resources/1.json", {}, {id: 1, name: "Resource 1"}.to_json
+      mock.get "/test_resources/2.json", {}, {id: 1, name: "Resource 2"}.to_json
     end
   end
 
@@ -105,6 +106,22 @@ RSpec.describe ActiveCachedResource::Caching do
       TestResource.clear_cache
       TestResource.find(1) # Cache cleared, fetch again
       expect_request("/test_resources/1.json", 2)
+    end
+
+    context "with a cache key pattern" do
+      it "clears the cache for matching keys" do
+        TestResource.find(1) # Cache the resource
+        expect_request("/test_resources/1.json", 1)
+
+        TestResource.find(2) # Cache the resource
+        expect_request("/test_resources/2.json", 1)
+
+        TestResource.clear_cache("1*")
+
+        TestResource.find(1) # Cache cleared, fetch again
+        expect_request("/test_resources/1.json", 2)
+        expect_request("/test_resources/2.json", 1)
+      end
     end
   end
 

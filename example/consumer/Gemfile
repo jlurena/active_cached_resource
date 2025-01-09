@@ -1,7 +1,6 @@
 source "https://rubygems.org"
 
 gem "active_cached_resource", path: "../../"
-gem "activeresource", git: "https://github.com/jlurena/activeresource.git", branch: "ISSUE-408-lazy-network-calls"
 gem "rails", "~> 8.0.0"
 gem "sqlite3", ">= 2.1"
 gem "puma", ">= 5.0"

@@ -6,7 +6,7 @@ class PeopleController < ApplicationController
   # @see https://github.com/rails/activeresource#find
   def index
     persons = Person.includes(:addresses, :company)
-    render json: persons.as_json(include: { addresses: {}, company: {} })
+    render json: persons.as_json(include: {addresses: {}, company: {}})
   end
 
   # Show expects a single JSON object with a 200 status code
@@ -15,7 +15,7 @@ class PeopleController < ApplicationController
   def show
     person = Person.includes(:addresses, :company).find_by(id: params[:id])
     if person
-      render json: person.as_json(include: { addresses: {}, company: {} })
+      render json: person.as_json(include: {addresses: {}, company: {}})
     else
       head :not_found
     end
@@ -24,7 +24,6 @@ class PeopleController < ApplicationController
   # Create expects an empty response with 201 status and a Location header
   # @see https://github.com/rails/activeresource#update
   def create
-    binding.pry
     person = Person.new(person_params)
     if person.save
       head :created, location: person_url(person)
@@ -40,7 +39,7 @@ class PeopleController < ApplicationController
     if person&.update(person_params)
       head :no_content
     else
-      render json: person&.errors || { error: 'Person not found' }, status: :unprocessable_entity
+      render json: person&.errors || {error: "Person not found"}, status: :unprocessable_entity
     end
   end
 
@@ -51,7 +50,7 @@ class PeopleController < ApplicationController
     if person&.destroy
       head :ok
     else
-      render json: person&.errors || { error: 'Person not found' }, status: :unprocessable_entity
+      render json: person&.errors || {error: "Person not found"}, status: :unprocessable_entity
     end
   end
 

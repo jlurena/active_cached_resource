@@ -8,6 +8,11 @@ module ActiveCachedResource
     extend ActiveSupport::Concern
 
     included do
+      before_save :invalidate_cache
+
+      after_save :save_to_cache
+      after_destroy :invalidate_cache
+
       class << self
         attr_accessor :cached_resource
 
@@ -47,5 +52,15 @@ module ActiveCachedResource
       end
     end
     # :nodoc:
+
+    private
+
+    def invalidate_cache
+      self.class.clear_cache(id.to_s)
+    end
+
+    def save_to_cache
+      self.class.send(:cache_write, self, id)
+    end
   end
 end
