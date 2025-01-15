@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require "dotenv/load"
-require "pry-byebug"
 require "rubygems" unless defined? Gem
 require "bundler/setup"
 

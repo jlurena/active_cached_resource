@@ -2,7 +2,6 @@
 
 require "dotenv/load"
 require "msgpack"
-require "pry-byebug"
 
 require "simplecov"
 
