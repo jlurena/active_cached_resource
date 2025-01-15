@@ -21,6 +21,23 @@ module ActiveResource # :nodoc:
     attr_writer :prefix_options
     attr_reader :from
 
+    # Returns a frozen empty collection.
+    #
+    # @return [ActiveResource::Collection] an empty collection
+    def self.none
+      new([]).tap do |collection|
+        collection.instance_variable_set(:@requested, true)
+      end
+    end
+
+    # Creates a new ActiveResource::Collection instance.
+    #
+    # ==== Arguments
+    #
+    # +elements+ (Array<Object>) - An optional array of resources to be set as the collection elements.
+    #                              Defaults to an empty array.
+    # +from+ (String, Symbol) - The path to the collection resource or the symbol for the collection resource.
+
     # ActiveResource::Collection is a wrapper to handle parsing index responses that
     # do not directly map to Rails conventions.
     #
@@ -98,12 +115,12 @@ module ActiveResource # :nodoc:
       @prefix_options || {}
     end
 
-    # Refreshes the collection by re-fetching the resources from the API.
+    # Reload the collection by re-fetching the resources from the API.
     #
     # ==== Returns
     #
     # [Array<Object>] The collection of resources retrieved from the API.
-    def refresh
+    def reload
       @requested = false
       request_resources!
     end
@@ -182,6 +199,7 @@ module ActiveResource # :nodoc:
     #   # => PostCollection:xxx (filtered collection)
     def where(clauses = {})
       raise ArgumentError, "expected a clauses Hash, got #{clauses.inspect}" unless clauses.is_a? Hash
+      return self.class.none if resource_class.nil?
       new_clauses = query_params.merge(clauses)
       resource_class.where(new_clauses)
     end

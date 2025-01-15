@@ -1,9 +1,16 @@
-## [0.1.5] - 2024-01-30
+## [0.1.6] - 2024-01-15
+- Renamed `ActiveResource::Collection#refresh` to `#reload` to match Rails ORM naming convention.
+- Added a `ActiveResource::Collection.none` class method similar to Rails `ActiveRecord::QueryMethods.none`
+- Enhanced `ActiveResource::Collection#where` so that it returns `ActiveResource::Collection.none` if `resource_class` is missing.
+    - This is useful for when `where` clauses are chained on an empty `ActiveResource::Collection`
+
+## [0.1.5] - 2024-01-09
 - Added callbacks to cache:
     - Create/POST, refresh cache after successful POST request
     - Update/PUT, refresh cache after successful PUT request
     - Destroy/DELETE, invalidate cache after successful DELETE request
 - Fixed issue with generator for SQLCache strategy tables
+
 ## [0.1.4] - 2024-12-20
 - CI Improvements
     - Added annotations

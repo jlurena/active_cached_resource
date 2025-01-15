@@ -28,6 +28,16 @@ class BasicCollectionTest < CollectionTest
   def respond_to_where
     assert @collection.respond_to?(:where)
   end
+
+  def test_where_without_resource_class
+    assert_equal @collection.where(foo: 'bar'), ActiveResource::Collection.none
+  end
+
+  def test_none
+    none = ActiveResource::Collection.none
+    assert_kind_of ActiveResource::Collection, none
+    assert_empty none
+  end
 end
 
 class PaginatedCollection < ActiveResource::Collection
@@ -174,7 +184,7 @@ class CollectionInheritanceTest < ActiveSupport::TestCase
     posts.to_a
     assert posts.requested?
     assert_equal 1, ActiveResource::HttpMock.requests.count { |r| r == expected_request }
-    posts.refresh
+    posts.reload
     assert_equal 2, ActiveResource::HttpMock.requests.count { |r| r == expected_request }
     assert posts.requested?
   end

@@ -40,4 +40,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency "activemodel", ">= 6.0"
   spec.add_dependency "activesupport", ">= 6.0"
   spec.add_dependency "msgpack", "~> 1.7", ">= 1.7.5"
+  spec.add_dependency "ostruct", "~> 0.6.1"
 end
