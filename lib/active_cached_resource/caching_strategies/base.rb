@@ -1,5 +1,5 @@
 require "msgpack"
-require "pry-byebug"
+
 module ActiveCachedResource
   module CachingStrategies
     class Base

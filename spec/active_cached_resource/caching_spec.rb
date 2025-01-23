@@ -276,6 +276,8 @@ RSpec.describe ActiveCachedResource::Caching do
         ttl: 10.minutes,
         logger: logger
       )
+
+      TestResource.clear_cache
     end
 
     context "Caching" do
@@ -309,18 +311,41 @@ RSpec.describe ActiveCachedResource::Caching do
       end
     end
 
-    context "clear_cache" do
+    context ".clear_cache" do
       before do
         mock_single_resource
       end
 
       it "clears the cache" do
         TestResource.find(1) # Cache the resource
+        TestResource.find(2) # Cache the resource
         expect_request("/test_resources/1.json", 1)
+        expect_request("/test_resources/2.json", 1)
 
         TestResource.clear_cache
         TestResource.find(1) # Cache cleared, fetch again
+        TestResource.find(2) # Cache cleared, fetch again
         expect_request("/test_resources/1.json", 2)
+        expect_request("/test_resources/2.json", 2)
+      end
+    end
+
+    context ".delete_from_cache" do
+      before do
+        mock_single_resource
+      end
+
+      it "deletes the single resource" do
+        TestResource.find(1) # Cache the resource
+        TestResource.find(2) # Cache the resource
+        expect_request("/test_resources/1.json", 1)
+        expect_request("/test_resources/2.json", 1)
+
+        TestResource.delete_from_cache(1)
+        TestResource.find(1) # Cache cleared, fetch again
+        TestResource.find(2) # Cache cleared, fetch again
+        expect_request("/test_resources/1.json", 2)
+        expect_request("/test_resources/2.json", 1)
       end
     end
   end

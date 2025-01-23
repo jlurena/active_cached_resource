@@ -219,7 +219,6 @@ module ActiveCachedResource
       end
 
       def name_key
-        # `cache_key_prefix` is separated from key parts with a colon (:) to easily distinguish the prefix
         "#{cache_key_prefix}#{Constants::PREFIX_SEPARATOR}#{name.parameterize.tr("-", "/")}"
       end
 

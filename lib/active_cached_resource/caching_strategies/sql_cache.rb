@@ -11,6 +11,10 @@ module ActiveCachedResource
 
       protected
 
+      def delete_raw(key)
+        @model.where(key: key).delete_all
+      end
+
       def read_raw(key)
         record = @model.where(key: key).where(@model.arel_table[:expires_at].gt(Time.current)).first
         record&.value
