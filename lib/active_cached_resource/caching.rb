@@ -3,6 +3,7 @@ require_relative "collection"
 module ActiveCachedResource
   module Caching
     GLOBAL_PREFIX = "acr"
+    PREFIX_SEPARATOR = ":"
     RELOAD_PARAM = :_acr_reload
 
     extend ActiveSupport::Concern
@@ -140,13 +141,16 @@ module ActiveCachedResource
         should_reload ? find_via_reload(*args) : find_via_cache(*args)
       end
 
-      # Clears the cache for the specified pattern.
+      def delete_from_cache(id)
+        cached_resource.cache.delete(cache_key(id))
+      end
+
+      # Clears the entire cache for the specified model that matches current prefix.
       #
-      # @param pattern [String, nil] The pattern to match cache keys against.
-      #  If nil, all cache keys with this models prefix will be cleared.
       # @return [void]
-      def clear_cache(pattern = nil)
-        cached_resource.cache.clear("#{cache_key_prefix}/#{pattern}")
+      def clear_cache
+        cached_resource.logger.debug("Clearing cache for #{name} cache with prefix: #{cache_key_prefix}")
+        cached_resource.cache.clear(cache_key_prefix)
       end
 
       private
@@ -216,8 +220,8 @@ module ActiveCachedResource
       end
 
       def name_key
-        # `cache_key_prefix` is separated from key parts with a dash to easily distinguish the prefix
-        "#{cache_key_prefix}-" + name.parameterize.tr("-", "/")
+        # `cache_key_prefix` is separated from key parts with a colon (:) to easily distinguish the prefix
+        "#{cache_key_prefix}#{PREFIX_SEPARATOR}#{name.parameterize.tr("-", "/")}"
       end
 
       def cache_key_prefix

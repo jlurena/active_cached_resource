@@ -7,7 +7,7 @@ RSpec.describe ActiveCachedResource::CachingStrategies::Base do
   describe "#read" do
     it "will raise a NotImplementedError" do
       expect {
-        caching_strategy.read("prefix-key")
+        caching_strategy.read("prefix#{ActiveCachedResource::Caching::PREFIX_SEPARATOR}key")
       }.to raise_error(NotImplementedError, /must implement `read_raw`/)
     end
   end
@@ -15,7 +15,7 @@ RSpec.describe ActiveCachedResource::CachingStrategies::Base do
   describe "#write" do
     it "will raise a NotImplementedError" do
       expect {
-        caching_strategy.write("prefix-key", "", {expires_in: 3600})
+        caching_strategy.write("prefix#{ActiveCachedResource::Caching::PREFIX_SEPARATOR}key", "", {expires_in: 3600})
       }.to raise_error(NotImplementedError, /must implement `write_raw`/)
     end
   end
@@ -28,21 +28,21 @@ RSpec.describe ActiveCachedResource::CachingStrategies::Base do
 
   describe "#hash_key" do
     it "generates a hashed key with a prefix and SHA256 digest" do
-      key = "prefix-mykey"
+      key = "prefix#{ActiveCachedResource::Caching::PREFIX_SEPARATOR}mykey"
       hashed_key = caching_strategy.send(:hash_key, key)
 
-      prefix, digest = hashed_key.split("/")
+      prefix, digest = hashed_key.split(ActiveCachedResource::Caching::PREFIX_SEPARATOR)
       expect(prefix).to eq("prefix")
       expect(digest).to eq(Digest::SHA256.hexdigest("mykey"))
     end
 
     it "handles keys with multiple dashes" do
-      key = "prefix-part1-part2"
+      key = "prefix#{ActiveCachedResource::Caching::PREFIX_SEPARATOR}part1#{ActiveCachedResource::Caching::PREFIX_SEPARATOR}part2"
       hashed_key = caching_strategy.send(:hash_key, key)
 
-      prefix, digest = hashed_key.split("/")
+      prefix, digest = hashed_key.split(ActiveCachedResource::Caching::PREFIX_SEPARATOR)
       expect(prefix).to eq("prefix")
-      expect(digest).to eq(Digest::SHA256.hexdigest("part1-part2"))
+      expect(digest).to eq(Digest::SHA256.hexdigest("part1#{ActiveCachedResource::Caching::PREFIX_SEPARATOR}part2"))
     end
 
     context "Invalid keys" do

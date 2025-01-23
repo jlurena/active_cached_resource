@@ -101,27 +101,15 @@ RSpec.describe ActiveCachedResource::Caching do
 
     it "clears the cache" do
       TestResource.find(1) # Cache the resource
+      TestResource.find(2) # Cache the resource
       expect_request("/test_resources/1.json", 1)
+      expect_request("/test_resources/2.json", 1)
 
       TestResource.clear_cache
       TestResource.find(1) # Cache cleared, fetch again
+      TestResource.find(2) # Cache cleared, fetch again
       expect_request("/test_resources/1.json", 2)
-    end
-
-    context "with a cache key pattern" do
-      it "clears the cache for matching keys" do
-        TestResource.find(1) # Cache the resource
-        expect_request("/test_resources/1.json", 1)
-
-        TestResource.find(2) # Cache the resource
-        expect_request("/test_resources/2.json", 1)
-
-        TestResource.clear_cache("1*")
-
-        TestResource.find(1) # Cache cleared, fetch again
-        expect_request("/test_resources/1.json", 2)
-        expect_request("/test_resources/2.json", 1)
-      end
+      expect_request("/test_resources/2.json", 2)
     end
   end
 
@@ -219,7 +207,7 @@ RSpec.describe ActiveCachedResource::Caching do
 
     it "uses the callable proc to generate cache key prefix" do
       TestResource.find(1) # Cache the resource
-      hashed_key = custom_cache.send(:hash_key, "acr/dynamic_prefix-testresource/1")
+      hashed_key = custom_cache.send(:hash_key, "acr/dynamic_prefix#{ActiveCachedResource::Caching::PREFIX_SEPARATOR}testresource/1")
       expect(custom_cache.store.key?(hashed_key)).to be true
     end
 

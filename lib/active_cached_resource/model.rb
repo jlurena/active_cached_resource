@@ -1,4 +1,5 @@
 require "active_support/concern"
+require "pry-byebug"
 
 require_relative "caching"
 require_relative "configuration"
@@ -56,7 +57,7 @@ module ActiveCachedResource
     private
 
     def invalidate_cache
-      self.class.clear_cache(id.to_s)
+      self.class.delete_from_cache(id.to_s)
     end
 
     def save_to_cache

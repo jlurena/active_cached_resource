@@ -10,7 +10,7 @@ RSpec.shared_examples "a caching strategy" do
 
       it "compresses when writing and decompresses when retrieving" do
         value = {"name" => "test"}
-        key = "test-key"
+        key = "test#{ActiveCachedResource::Caching::PREFIX_SEPARATOR}key"
 
         expect(MessagePack).to receive(:pack).with(value).and_call_original
         expect(MessagePack).to receive(:unpack).with(value.to_msgpack).and_call_original
@@ -22,7 +22,7 @@ RSpec.shared_examples "a caching strategy" do
 
     context "when the key does not exist in the cache" do
       it "returns nil" do
-        expect(cache_instance.read("missing-key")).to be_nil
+        expect(cache_instance.read("missing#{ActiveCachedResource::Caching::PREFIX_SEPARATOR}key")).to be_nil
       end
     end
 
@@ -32,10 +32,10 @@ RSpec.shared_examples "a caching strategy" do
       end
 
       it "returns nil" do
-        raw_key = cache_instance.send(:hash_key, "invalid-key")
+        raw_key = cache_instance.send(:hash_key, "invalid#{ActiveCachedResource::Caching::PREFIX_SEPARATOR}key")
         cache_instance.send(:write_raw, raw_key, "invalid data", {expires_in: 3600})
 
-        expect(cache_instance.read("invalid-key")).to be_nil
+        expect(cache_instance.read("invalid#{ActiveCachedResource::Caching::PREFIX_SEPARATOR}key")).to be_nil
       end
     end
   end
@@ -43,14 +43,16 @@ RSpec.shared_examples "a caching strategy" do
   describe "#write" do
     context "when expires_in option is missing" do
       it "raises an ArgumentError" do
-        expect { cache_instance.write("test-key", "value", {}) }.to raise_error(ArgumentError, "`expires_in` option is required")
+        expect {
+          cache_instance.write("test#{ActiveCachedResource::Caching::PREFIX_SEPARATOR}key", "value", {})
+        }.to raise_error(ArgumentError, "`expires_in` option is required")
       end
     end
 
     context "when write succeeds" do
       it "stores the compressed value in the cache" do
         value = {"name" => "test"}
-        key = "test-key"
+        key = "test#{ActiveCachedResource::Caching::PREFIX_SEPARATOR}key"
         expect(cache_instance.write(key, value, expires_in: 3600)).to be_truthy
       end
     end
@@ -58,15 +60,17 @@ RSpec.shared_examples "a caching strategy" do
     context "when write fails" do
       it "returns false" do
         allow(cache_instance).to receive(:write_raw).and_return(false)
-        expect(cache_instance.write("test-key", "value", expires_in: 3600)).to be false
+        expect(
+          cache_instance.write("test#{ActiveCachedResource::Caching::PREFIX_SEPARATOR}key", "value", expires_in: 3600)
+        ).to be false
       end
     end
   end
 
   describe "#clear" do
     before do
-      cache_instance.write("test-key", "value", expires_in: 3600)
-      cache_instance.write("another-key", "value", expires_in: 3600)
+      cache_instance.write("test#{ActiveCachedResource::Caching::PREFIX_SEPARATOR}key", "value", expires_in: 3600)
+      cache_instance.write("another#{ActiveCachedResource::Caching::PREFIX_SEPARATOR}key", "value", expires_in: 3600)
     end
 
     it "removes matching keys from the cache" do
