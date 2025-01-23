@@ -15,8 +15,10 @@ module ActiveCachedResource
       end
 
       def write_raw(key, compressed_value, options)
-        upsert_written_keys(key, options)
-        @cache_store.write(key, compressed_value, options)
+        successful_write = @cache_store.write(key, compressed_value, options)
+        update_master_key(key, options) if successful_write
+
+        successful_write
       end
 
       def delete_raw(key)
@@ -25,21 +27,23 @@ module ActiveCachedResource
 
       def clear_raw(prefix)
         existing_keys = @cache_store.read(prefix)
-        existing_keys&.each do |key|
-          @cache_store.delete(key)
-        end
+        return if existing_keys.nil?
 
-        @cache_store.delete(prefix)
+        existing_keys.add(prefix)
+        @cache_store.delete_multi(existing_keys)
       end
 
-      def upsert_written_keys(key, options)
+      private
+
+      # Updates the `master` key, which contains keys for a given prefix.
+      def update_master_key(key, options)
         prefix, _ = split_key(key)
 
         existing_keys = @cache_store.read(prefix) || Set.new
         existing_keys.add(key)
 
         # Maintain the list of keys for twice the expiration time
-        @cache_store.write(prefix, existing_keys, expires_in: options[:expires_in] * 2)
+        @cache_store.write(prefix, existing_keys, expires_in: options[:expires_in])
       end
     end
   end
