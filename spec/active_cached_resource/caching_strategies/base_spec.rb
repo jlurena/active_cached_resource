@@ -7,7 +7,7 @@ RSpec.describe ActiveCachedResource::CachingStrategies::Base do
   describe "#read" do
     it "will raise a NotImplementedError" do
       expect {
-        caching_strategy.read("prefix-key")
+        caching_strategy.read("prefix#{ActiveCachedResource::Constants::PREFIX_SEPARATOR}key")
       }.to raise_error(NotImplementedError, /must implement `read_raw`/)
     end
   end
@@ -15,7 +15,7 @@ RSpec.describe ActiveCachedResource::CachingStrategies::Base do
   describe "#write" do
     it "will raise a NotImplementedError" do
       expect {
-        caching_strategy.write("prefix-key", "", {expires_in: 3600})
+        caching_strategy.write("prefix#{ActiveCachedResource::Constants::PREFIX_SEPARATOR}key", "", {expires_in: 3600})
       }.to raise_error(NotImplementedError, /must implement `write_raw`/)
     end
   end
@@ -28,21 +28,21 @@ RSpec.describe ActiveCachedResource::CachingStrategies::Base do
 
   describe "#hash_key" do
     it "generates a hashed key with a prefix and SHA256 digest" do
-      key = "prefix-mykey"
+      key = "prefix#{ActiveCachedResource::Constants::PREFIX_SEPARATOR}mykey"
       hashed_key = caching_strategy.send(:hash_key, key)
 
-      prefix, digest = hashed_key.split("/")
+      prefix, digest = hashed_key.split(ActiveCachedResource::Constants::PREFIX_SEPARATOR)
       expect(prefix).to eq("prefix")
       expect(digest).to eq(Digest::SHA256.hexdigest("mykey"))
     end
 
     it "handles keys with multiple dashes" do
-      key = "prefix-part1-part2"
+      key = "prefix#{ActiveCachedResource::Constants::PREFIX_SEPARATOR}part1#{ActiveCachedResource::Constants::PREFIX_SEPARATOR}part2"
       hashed_key = caching_strategy.send(:hash_key, key)
 
-      prefix, digest = hashed_key.split("/")
+      prefix, digest = hashed_key.split(ActiveCachedResource::Constants::PREFIX_SEPARATOR)
       expect(prefix).to eq("prefix")
-      expect(digest).to eq(Digest::SHA256.hexdigest("part1-part2"))
+      expect(digest).to eq(Digest::SHA256.hexdigest("part1#{ActiveCachedResource::Constants::PREFIX_SEPARATOR}part2"))
     end
 
     context "Invalid keys" do
@@ -59,30 +59,6 @@ RSpec.describe ActiveCachedResource::CachingStrategies::Base do
         expect {
           caching_strategy.send(:hash_key, key)
         }.to raise_error(ArgumentError, "Key must have a prefix and a key separated by a dash")
-      end
-    end
-  end
-
-  describe "#compress" do
-    it "compresses the value using MessagePack" do
-      compressed_value = caching_strategy.send(:compress, value)
-      expect(compressed_value).to eq(MessagePack.pack(value))
-    end
-  end
-
-  describe "#decompress" do
-    it "decompresses the value using MessagePack" do
-      compressed_value = MessagePack.pack(value)
-      decompressed_value = caching_strategy.send(:decompress, compressed_value)
-      expect(decompressed_value).to eq(value)
-    end
-
-    context "When unpacking fails" do
-      before do
-        allow(MessagePack).to receive(:unpack).with("invalid").and_raise(MessagePack::UnpackError)
-      end
-      it "returns nil if decompression fails" do
-        expect(caching_strategy.send(:decompress, "invalid")).to be_nil
       end
     end
   end

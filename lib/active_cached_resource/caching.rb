@@ -2,9 +2,6 @@ require_relative "collection"
 
 module ActiveCachedResource
   module Caching
-    GLOBAL_PREFIX = "acr"
-    RELOAD_PARAM = :_acr_reload
-
     extend ActiveSupport::Concern
 
     included do
@@ -128,7 +125,7 @@ module ActiveCachedResource
         # Hacky but this way ActiveCachedResource::Collection#request_resources! can access it
         if should_reload && args.first == :all
           options[:params] = {} if options[:params].blank?
-          options[:params][RELOAD_PARAM] = should_reload
+          options[:params][Constants::RELOAD_PARAM] = should_reload
           args << options
         end
 
@@ -140,13 +137,19 @@ module ActiveCachedResource
         should_reload ? find_via_reload(*args) : find_via_cache(*args)
       end
 
-      # Clears the cache for the specified pattern.
+      # Deletes a resource from the cache.
       #
-      # @param pattern [String, nil] The pattern to match cache keys against.
-      #  If nil, all cache keys with this models prefix will be cleared.
+      # @param id [Object] the identifier of the resource to be deleted from the cache.
+      def delete_from_cache(id)
+        cached_resource.cache.delete(cache_key(id))
+      end
+
+      # Clears the entire cache for the specified model that matches current prefix.
+      #
       # @return [void]
-      def clear_cache(pattern = nil)
-        cached_resource.cache.clear("#{cache_key_prefix}/#{pattern}")
+      def clear_cache
+        cached_resource.logger.debug("Clearing cache for #{name} cache with prefix: #{cache_key_prefix}")
+        cached_resource.cache.clear(cache_key_prefix)
       end
 
       private
@@ -216,8 +219,7 @@ module ActiveCachedResource
       end
 
       def name_key
-        # `cache_key_prefix` is separated from key parts with a dash to easily distinguish the prefix
-        "#{cache_key_prefix}-" + name.parameterize.tr("-", "/")
+        "#{cache_key_prefix}#{Constants::PREFIX_SEPARATOR}#{name.parameterize.tr("-", "/")}"
       end
 
       def cache_key_prefix
@@ -228,9 +230,9 @@ module ActiveCachedResource
           if !result.is_a?(String) || result.empty?
             raise ArgumentError, "cache_key_prefix must return a non-empty String"
           end
-          "#{GLOBAL_PREFIX}/#{result}"
+          "#{Constants::GLOBAL_PREFIX}/#{result}"
         else
-          "#{GLOBAL_PREFIX}/#{prefix}"
+          "#{Constants::GLOBAL_PREFIX}/#{prefix}"
         end
       end
 

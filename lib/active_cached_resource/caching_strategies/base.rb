@@ -1,4 +1,3 @@
-require "msgpack"
 module ActiveCachedResource
   module CachingStrategies
     class Base
@@ -27,6 +26,14 @@ module ActiveCachedResource
         raise ArgumentError, "`expires_in` option is required" unless options[:expires_in]
 
         write_raw(hash_key(key), compress(value), options)
+      end
+
+      # Deletes the cached value associated with the given key.
+      #
+      # @param key [Object] the key whose associated cached value is to be deleted.
+      # @return [void]
+      def delete(key)
+        delete_raw(hash_key(key))
       end
 
       # Clears the cache based on the given pattern.
@@ -76,6 +83,22 @@ module ActiveCachedResource
         raise NotImplementedError, "#{self.class} must implement `clear_raw`"
       end
 
+      protected
+
+      # Splits the provided key into a prefix and the remaining part
+      #
+      # @param key [String] the key to be split
+      #
+      # @example Splitting a key
+      #  split_key("prefix-key") #=> "acr/prefix/keyvalue"
+      #
+      # @return [Array<String>] an array containing two elements: the part before the first "-", and the rest of the string
+      def split_key(key)
+        # Prefix of keys are expected to be the first part of key separated by a dash.
+        prefix, k = key.split(ActiveCachedResource::Constants::PREFIX_SEPARATOR, 2)
+        [prefix, k]
+      end
+
       private
 
       # Generates a hashed key for caching purposes.
@@ -88,25 +111,25 @@ module ActiveCachedResource
       # @example Hashing a key
       #  hash_key("prefix-key") #=> "acr/prefix/Digest::SHA256.hexdigest(key)"
       #
+      # @raise [ArgumentError] If the key does not contain a prefix and a key separated by a dash.
+      #
       # @param key [String] the original key to be hashed. It is expected to have a prefix and the key separated by a dash.
       # @return [String] the generated hashed key with the global prefix and the prefix from the original key.
       def hash_key(key)
-        # Prefix of keys are expected to be the first part of key separated by a dash.
-        prefix, k = key.split("-", 2)
+        prefix, k = split_key(key)
         if prefix.nil? || k.nil?
           raise ArgumentError, "Key must have a prefix and a key separated by a dash"
         end
-
-        "#{prefix}/" + Digest::SHA256.hexdigest(k)
+        "#{prefix}#{ActiveCachedResource::Constants::PREFIX_SEPARATOR}#{Digest::SHA256.hexdigest(k)}"
       end
 
       def compress(value)
-        MessagePack.pack(value)
+        value.to_json
       end
 
       def decompress(value)
-        MessagePack.unpack(value)
-      rescue MessagePack::UnpackError
+        JSON.parse(value)
+      rescue JSON::ParserError
         nil
       end
     end
