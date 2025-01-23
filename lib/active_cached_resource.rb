@@ -2,6 +2,7 @@
 
 require_relative "activeresource/lib/activeresource"
 
+require_relative "active_cached_resource/constants"
 require_relative "active_cached_resource/model"
 require_relative "active_cached_resource/version"
 

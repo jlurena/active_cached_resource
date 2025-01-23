@@ -97,7 +97,7 @@ module ActiveCachedResource
       # @return [Array<String>] an array containing two elements: the part before the first "-", and the rest of the string
       def split_key(key)
         # Prefix of keys are expected to be the first part of key separated by a dash.
-        prefix, k = key.split(ActiveCachedResource::Caching::PREFIX_SEPARATOR, 2)
+        prefix, k = key.split(ActiveCachedResource::Constants::PREFIX_SEPARATOR, 2)
         [prefix, k]
       end
 
@@ -122,7 +122,7 @@ module ActiveCachedResource
         if prefix.nil? || k.nil?
           raise ArgumentError, "Key must have a prefix and a key separated by a dash"
         end
-        "#{prefix}#{ActiveCachedResource::Caching::PREFIX_SEPARATOR}#{Digest::SHA256.hexdigest(k)}"
+        "#{prefix}#{ActiveCachedResource::Constants::PREFIX_SEPARATOR}#{Digest::SHA256.hexdigest(k)}"
       end
 
       def compress(value)

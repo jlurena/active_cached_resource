@@ -7,7 +7,7 @@ module ActiveCachedResource
 
       # Delete the reload param from query params.
       # This is drilled down via `params` option to determine if the collection should be reloaded
-      should_reload = query_params.delete(ActiveCachedResource::Caching::RELOAD_PARAM)
+      should_reload = query_params.delete(Constants::RELOAD_PARAM)
       if !should_reload
         from_cache = resource_class.send(:cache_read, from, path_params, query_params, prefix_options)
         @elements = from_cache

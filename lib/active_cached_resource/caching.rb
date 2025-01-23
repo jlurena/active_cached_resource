@@ -2,10 +2,6 @@ require_relative "collection"
 
 module ActiveCachedResource
   module Caching
-    GLOBAL_PREFIX = "acr"
-    PREFIX_SEPARATOR = ":"
-    RELOAD_PARAM = :_acr_reload
-
     extend ActiveSupport::Concern
 
     included do
@@ -129,7 +125,7 @@ module ActiveCachedResource
         # Hacky but this way ActiveCachedResource::Collection#request_resources! can access it
         if should_reload && args.first == :all
           options[:params] = {} if options[:params].blank?
-          options[:params][RELOAD_PARAM] = should_reload
+          options[:params][Constants::RELOAD_PARAM] = should_reload
           args << options
         end
 
@@ -221,7 +217,7 @@ module ActiveCachedResource
 
       def name_key
         # `cache_key_prefix` is separated from key parts with a colon (:) to easily distinguish the prefix
-        "#{cache_key_prefix}#{PREFIX_SEPARATOR}#{name.parameterize.tr("-", "/")}"
+        "#{cache_key_prefix}#{Constants::PREFIX_SEPARATOR}#{name.parameterize.tr("-", "/")}"
       end
 
       def cache_key_prefix
@@ -232,9 +228,9 @@ module ActiveCachedResource
           if !result.is_a?(String) || result.empty?
             raise ArgumentError, "cache_key_prefix must return a non-empty String"
           end
-          "#{GLOBAL_PREFIX}/#{result}"
+          "#{Constants::GLOBAL_PREFIX}/#{result}"
         else
-          "#{GLOBAL_PREFIX}/#{prefix}"
+          "#{Constants::GLOBAL_PREFIX}/#{prefix}"
         end
       end
 

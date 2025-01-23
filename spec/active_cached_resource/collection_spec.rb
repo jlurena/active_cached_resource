@@ -72,14 +72,14 @@ RSpec.describe ActiveCachedResource::Collection do
 
     context "when RELOAD_PARAM is passed" do
       it "removes the parameter from the HTTP request" do
-        query_params = {ActiveCachedResource::Caching::RELOAD_PARAM => true, :param => "value"}
+        query_params = {ActiveCachedResource::Constants::RELOAD_PARAM => true, :param => "value"}
         collection.instance_variable_set(:@query_params, query_params)
 
         mock_http_get("/test_resources.json?param=value", [{id: 1, name: "Fetched Resource"}])
         collection.to_a
 
         query_params = collection.instance_variable_get(:@query_params)
-        expect(query_params).not_to have_key(ActiveCachedResource::Caching::RELOAD_PARAM)
+        expect(query_params).not_to have_key(ActiveCachedResource::Constants::RELOAD_PARAM)
       end
     end
 

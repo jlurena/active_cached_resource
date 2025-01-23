@@ -207,7 +207,7 @@ RSpec.describe ActiveCachedResource::Caching do
 
     it "uses the callable proc to generate cache key prefix" do
       TestResource.find(1) # Cache the resource
-      hashed_key = custom_cache.send(:hash_key, "acr/dynamic_prefix#{ActiveCachedResource::Caching::PREFIX_SEPARATOR}testresource/1")
+      hashed_key = custom_cache.send(:hash_key, "acr/dynamic_prefix#{ActiveCachedResource::Constants::PREFIX_SEPARATOR}testresource/1")
       expect(custom_cache.store.key?(hashed_key)).to be true
     end
 
