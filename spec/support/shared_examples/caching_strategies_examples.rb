@@ -3,17 +3,9 @@ RSpec.shared_examples "a caching strategy" do
 
   describe "#read" do
     context "when the key exists in the cache" do
-      before do
-        allow(MessagePack).to receive(:pack).and_call_original
-        allow(MessagePack).to receive(:unpack).and_call_original
-      end
-
       it "compresses when writing and decompresses when retrieving" do
         value = {"name" => "test"}
         key = "test#{ActiveCachedResource::Constants::PREFIX_SEPARATOR}key"
-
-        expect(MessagePack).to receive(:pack).with(value).and_call_original
-        expect(MessagePack).to receive(:unpack).with(value.to_msgpack).and_call_original
 
         cache_instance.write(key, value, expires_in: 3600)
         expect(cache_instance.read(key)).to eq(value)
@@ -28,7 +20,7 @@ RSpec.shared_examples "a caching strategy" do
 
     context "when decompression fails" do
       before do
-        allow(MessagePack).to receive(:unpack).and_raise(MessagePack::UnpackError)
+        allow(JSON).to receive(:parse).and_raise(JSON::ParserError)
       end
 
       it "returns nil" do

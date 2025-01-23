@@ -62,28 +62,4 @@ RSpec.describe ActiveCachedResource::CachingStrategies::Base do
       end
     end
   end
-
-  describe "#compress" do
-    it "compresses the value using MessagePack" do
-      compressed_value = caching_strategy.send(:compress, value)
-      expect(compressed_value).to eq(MessagePack.pack(value))
-    end
-  end
-
-  describe "#decompress" do
-    it "decompresses the value using MessagePack" do
-      compressed_value = MessagePack.pack(value)
-      decompressed_value = caching_strategy.send(:decompress, compressed_value)
-      expect(decompressed_value).to eq(value)
-    end
-
-    context "When unpacking fails" do
-      before do
-        allow(MessagePack).to receive(:unpack).with("invalid").and_raise(MessagePack::UnpackError)
-      end
-      it "returns nil if decompression fails" do
-        expect(caching_strategy.send(:decompress, "invalid")).to be_nil
-      end
-    end
-  end
 end

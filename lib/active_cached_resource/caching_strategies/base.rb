@@ -1,5 +1,3 @@
-require "msgpack"
-
 module ActiveCachedResource
   module CachingStrategies
     class Base
@@ -126,12 +124,12 @@ module ActiveCachedResource
       end
 
       def compress(value)
-        MessagePack.pack(value)
+        value.to_json
       end
 
       def decompress(value)
-        MessagePack.unpack(value)
-      rescue MessagePack::UnpackError
+        JSON.parse(value)
+      rescue JSON::ParserError
         nil
       end
     end
