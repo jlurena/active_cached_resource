@@ -137,6 +137,9 @@ module ActiveCachedResource
         should_reload ? find_via_reload(*args) : find_via_cache(*args)
       end
 
+      # Deletes a resource from the cache.
+      #
+      # @param id [Object] the identifier of the resource to be deleted from the cache.
       def delete_from_cache(id)
         cached_resource.cache.delete(cache_key(id))
       end

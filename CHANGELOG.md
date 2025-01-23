@@ -1,3 +1,7 @@
+## [0.1.7] - 2024-01-23
+- Improved `clear_cache` method for `active_support_cache` strategy to no longer use `delete_matched`.
+- Introduced `.delete_from_cache` method to delete single cached resources.
+
 ## [0.1.6] - 2024-01-15
 - Renamed `ActiveResource::Collection#refresh` to `#reload` to match Rails ORM naming convention.
 - Added a `ActiveResource::Collection.none` class method similar to Rails `ActiveRecord::QueryMethods.none`

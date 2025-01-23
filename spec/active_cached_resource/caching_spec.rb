@@ -96,7 +96,7 @@ RSpec.describe ActiveCachedResource::Caching do
     end
   end
 
-  describe "#clear" do
+  describe ".clear_cache" do
     before { mock_single_resource }
 
     it "clears the cache" do
@@ -113,7 +113,7 @@ RSpec.describe ActiveCachedResource::Caching do
     end
   end
 
-  describe "#find_with_cache" do
+  describe ".find_with_cache" do
     context "when caching single resources" do
       before { mock_single_resource }
 
@@ -156,6 +156,23 @@ RSpec.describe ActiveCachedResource::Caching do
           expect_request("/test_resources.json", 2)
         end
       end
+    end
+  end
+
+  describe ".delete_from_cache" do
+    before { mock_single_resource }
+
+    it "deletes a resource from the cache" do
+      TestResource.find(1) # Cache the resource
+      expect_request("/test_resources/1.json", 1)
+
+      TestResource.delete_from_cache(1)
+      TestResource.find(1) # Cache deleted, fetch again
+      expect_request("/test_resources/1.json", 2)
+    end
+
+    it "does not raise an error if the resource is not in the cache" do
+      expect { TestResource.delete_from_cache(999) }.not_to raise_error
     end
   end
 
