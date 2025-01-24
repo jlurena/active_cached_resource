@@ -30,7 +30,7 @@ module ActiveCachedResource
         return if existing_keys.nil?
 
         existing_keys.add(prefix)
-        @cache_store.delete_multi(existing_keys)
+        @cache_store.delete_multi(existing_keys.to_a) # Redis implementation does not work with Sets
       end
 
       private
