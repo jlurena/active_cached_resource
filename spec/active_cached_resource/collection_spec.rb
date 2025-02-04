@@ -11,9 +11,40 @@ class TestResource < ActiveResource::Base
   )
 end
 
+# Helpers
+def mock_http_get(path, response_body, status = 200)
+  ActiveResource::HttpMock.respond_to do |mock|
+    mock.get path, {}, response_body.to_json, status
+  end
+end
+
+def fetch_and_validate_elements(expected_names)
+  collection.to_a
+  elements = collection.instance_variable_get(:@elements)
+  expect(elements.map(&:name)).to eq(expected_names)
+end
+
 RSpec.describe ActiveCachedResource::Collection do
   it "has a version number" do
     expect(ActiveCachedResource::VERSION).not_to be nil
+  end
+
+  describe "#reload" do
+    before do
+      ActiveResource::HttpMock.reset!
+      TestResource.clear_cache
+    end
+
+    it "fetches resources from the API even if they are cached" do
+      mock_http_get("/test_resources.json", [{id: 1, name: "Reloaded Resource"}])
+
+      collection = TestResource.all.call # First call
+      collection.reload # Reload call, should fetch from API
+
+      TestResource.all # Third call, should fetch from cache
+      expect(ActiveResource::HttpMock.requests.size).to eq(2)
+      expect(collection.to_a.map(&:name)).to eq(["Reloaded Resource"])
+    end
   end
 
   describe "#request_resources!" do
@@ -22,19 +53,6 @@ RSpec.describe ActiveCachedResource::Collection do
     before do
       ActiveResource::HttpMock.reset!
       TestResource.clear_cache
-    end
-
-    # Helpers
-    def mock_http_get(path, response_body, status = 200)
-      ActiveResource::HttpMock.respond_to do |mock|
-        mock.get path, {}, response_body.to_json, status
-      end
-    end
-
-    def fetch_and_validate_elements(expected_names)
-      collection.to_a
-      elements = collection.instance_variable_get(:@elements)
-      expect(elements.map(&:name)).to eq(expected_names)
     end
 
     context "when `from` is a Symbol" do

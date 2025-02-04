@@ -1,3 +1,6 @@
+## [0.2.0] - 2024-02-15
+- Fixed bug not allowing reloading collection cache
+
 ## [0.1.7] - 2024-01-23
 - Improved `clear_cache` method for `active_support_cache` strategy to no longer use `delete_matched`.
 - Introduced `.delete_from_cache` method to delete single cached resources.

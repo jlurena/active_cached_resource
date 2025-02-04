@@ -1,5 +1,15 @@
 module ActiveCachedResource
   class Collection < ActiveResource::Collection
+    # Reload the collection by re-fetching the resources from the API.
+    #
+    # ==== Returns
+    #
+    # [Array<Object>] The collection of resources retrieved from the API.
+    def reload
+      query_params[Constants::RELOAD_PARAM] = true
+      super
+    end
+
     private
 
     def request_resources!
