@@ -148,7 +148,7 @@ module ActiveCachedResource
       #
       # @return [void]
       def clear_cache
-        cached_resource.logger.debug("Clearing cache for #{name} cache with prefix: #{cache_key_prefix}")
+        cached_resource.logger.info("Clearing cache for #{name} cache with prefix: #{cache_key_prefix}")
         cached_resource.cache.clear(cache_key_prefix)
       end
 
@@ -166,7 +166,7 @@ module ActiveCachedResource
 
         return nil if json_string.nil?
 
-        cached_resource.logger.debug("[KEY:#{key}] Cache hit")
+        cached_resource.logger.info("[KEY:#{key}] Cache hit")
         json_to_object(json_string)
       end
 
