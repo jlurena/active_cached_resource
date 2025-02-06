@@ -1,5 +1,9 @@
-## [0.2.0] - 2024-02-15
+## [0.1.9] - 2024-02-05
 - Fixed bug not allowing reloading collection cache
+- Change debug to info for cache hits
+
+## [0.1.8] - 2024-01-24
+- Fixed issue with `#clear_cache` method with Redis
 
 ## [0.1.7] - 2024-01-23
 - Improved `clear_cache` method for `active_support_cache` strategy to no longer use `delete_matched`.
