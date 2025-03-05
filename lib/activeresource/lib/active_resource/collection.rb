@@ -122,7 +122,7 @@ module ActiveResource # :nodoc:
     # [Array<Object>] The collection of resources retrieved from the API.
     def reload
       @requested = false
-      request_resources!
+      call
     end
 
     # Executes the request to fetch the collection of resources from the API and returns the collection.

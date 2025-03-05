@@ -184,7 +184,7 @@ class CollectionInheritanceTest < ActiveSupport::TestCase
     posts.to_a
     assert posts.requested?
     assert_equal 1, ActiveResource::HttpMock.requests.count { |r| r == expected_request }
-    posts.reload
+    assert_kind_of PaginatedCollection, posts.reload
     assert_equal 2, ActiveResource::HttpMock.requests.count { |r| r == expected_request }
     assert posts.requested?
   end
