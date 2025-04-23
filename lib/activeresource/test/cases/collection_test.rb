@@ -68,7 +68,7 @@ class ArrayMethodDelegate < ActiveSupport::TestCase
       :==, :[], :&, :*, :+, :-, :<=>, :all?, :any?, :as_json, :at, :assoc, :blank?, :bsearch, :bsearch_index,
       :collect, :combination, :compact, :count, :cycle, :deconstruct, :deep_dup, :dig, :difference, :drop,
       :drop_while, :each, :each_index, :empty?, :eql?, :excluding, :filter, :fifth, :find_index, :first,
-      :flatten, :forty_two, :fourth, :from, :hash, :include?, :including, :index, :inspect, :intersect?,
+      :flatten, :fourth, :from, :hash, :include?, :including, :index, :inspect, :intersect?,
       :intersection, :join, :last, :length, :map, :max, :min, :minmax, :none?, :one?, :pack, :permutation,
       :pretty_print_cycle, :present?, :product, :reject, :repeated_combination, :repeated_permutation,
       :rassoc, :reverse, :reverse_each, :rindex, :rotate, :sample, :second, :second_to_last, :select,

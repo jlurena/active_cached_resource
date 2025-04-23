@@ -1,7 +1,31 @@
 # frozen_string_literal: true
 
+class TestCollectionWithPersistedAttributes < ActiveCachedResource::Collection
+  persisted_attribute :custom_attr, :another_attr
+
+  def parse_response(elements)
+    @elements = elements
+    @custom_attr = "Foo"
+    @another_attr = "Bar"
+  end
+end
+
+class TestCollection < ActiveCachedResource::Collection; end
+
 class TestResource < ActiveResource::Base
   self.site = "https://api.example.com"
+
+  setup_cached_resource!(
+    cache_store: ActiveSupport::Cache::MemoryStore.new,
+    cache_strategy: :active_support_cache,
+    ttl: 10.minutes,
+    logger: Logger.new(IO::NULL)
+  )
+end
+
+class TestResourceAttribute < ActiveResource::Base
+  self.site = "https://api.example.com"
+  self.collection_parser = TestCollectionWithPersistedAttributes
 
   setup_cached_resource!(
     cache_store: ActiveSupport::Cache::MemoryStore.new,
@@ -103,7 +127,7 @@ RSpec.describe ActiveCachedResource::Collection do
 
     context "when cache_read returns a result" do
       it "exits early without performing an HTTP call" do
-        cached_result = [TestResource.new(id: 1, name: "Cached Resource")]
+        cached_result = ActiveCachedResource::Collection.new([TestResource.new(id: 1, name: "Cached Resource")])
         allow(TestResource).to receive(:cache_read).and_return(cached_result)
 
         expect(TestResource.connection).not_to receive(:get)
@@ -159,6 +183,45 @@ RSpec.describe ActiveCachedResource::Collection do
         collection.to_a
         expect(collection.instance_variable_get(:@requested)).to be true
       end
+    end
+
+    context "when collection has custom virtual attribtues" do
+      it "updates the collection with the new attributes from cache" do
+        mock_http_get("/test_resource_attributes.json", [{id: 1, name: "Symbol Resource"}])
+        collection = TestResourceAttribute.all.call
+        expect(collection.custom_attr).to eq("Foo")
+        expect(collection.another_attr).to eq("Bar")
+
+        collection = TestResourceAttribute.all.call # Second call to ensure cache is used
+        expect(collection.custom_attr).to eq("Foo")
+        expect(collection.another_attr).to eq("Bar")
+        expect(ActiveResource::HttpMock.requests.size).to eq(1)
+      end
+    end
+  end
+
+  describe "#virtual_persistable_attributes" do
+    let(:collection) { TestCollectionWithPersistedAttributes.new }
+
+    it "returns a hash of virtual persisted attributes with their values" do
+      collection.custom_attr = "Custom Value"
+      collection.another_attr = "Another Value"
+
+      expect(collection.virtual_persistable_attributes).to eq({
+        custom_attr: "Custom Value",
+        another_attr: "Another Value"
+      })
+    end
+
+    it "returns an empty hash if no virtual persisted attributes are set" do
+      expect(TestCollection.new.virtual_persistable_attributes).to eq({})
+    end
+
+    it "includes only the attributes defined as persisted" do
+      collection.custom_attr = "Custom Value"
+      collection.instance_variable_set(:@non_persisted_attr, "Non-Persisted Value")
+
+      expect(collection.virtual_persistable_attributes).not_to have_key(:non_persisted_attr)
     end
   end
 end

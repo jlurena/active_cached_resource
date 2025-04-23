@@ -1,3 +1,9 @@
+## [0.2.0] - 2024-04-25
+- Allow virtual attributes to be persisted into cache with introduction of `ActiveCachedResource::Collection.persisted_attribute`.
+
+## [0.1.10] - 2024-03-05
+- Patch Collection#reload to return correct type
+
 ## [0.1.9] - 2024-02-05
 - Fixed bug not allowing reloading collection cache
 - Change debug to info for cache hits
