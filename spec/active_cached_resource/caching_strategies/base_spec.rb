@@ -33,7 +33,7 @@ RSpec.describe ActiveCachedResource::CachingStrategies::Base do
 
       prefix, digest = hashed_key.split(ActiveCachedResource::Constants::PREFIX_SEPARATOR)
       expect(prefix).to eq("prefix")
-      expect(digest).to eq(Digest::SHA256.hexdigest("mykey"))
+      expect(digest).to eq(Digest::MD5.hexdigest("mykey"))
     end
 
     it "handles keys with multiple dashes" do
@@ -42,7 +42,7 @@ RSpec.describe ActiveCachedResource::CachingStrategies::Base do
 
       prefix, digest = hashed_key.split(ActiveCachedResource::Constants::PREFIX_SEPARATOR)
       expect(prefix).to eq("prefix")
-      expect(digest).to eq(Digest::SHA256.hexdigest("part1#{ActiveCachedResource::Constants::PREFIX_SEPARATOR}part2"))
+      expect(digest).to eq(Digest::MD5.hexdigest("part1#{ActiveCachedResource::Constants::PREFIX_SEPARATOR}part2"))
     end
 
     context "Invalid keys" do

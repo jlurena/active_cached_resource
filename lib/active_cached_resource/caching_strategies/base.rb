@@ -120,7 +120,7 @@ module ActiveCachedResource
         if prefix.nil? || k.nil?
           raise ArgumentError, "Key must have a prefix and a key separated by a dash"
         end
-        "#{prefix}#{ActiveCachedResource::Constants::PREFIX_SEPARATOR}#{Digest::SHA256.hexdigest(k)}"
+        "#{prefix}#{ActiveCachedResource::Constants::PREFIX_SEPARATOR}#{Digest::MD5.hexdigest(k)}"
       end
 
       def compress(value)
