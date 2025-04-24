@@ -40,9 +40,10 @@ module ActiveCachedResource
       #   @option options [Hash] :params
       #     Query and prefix (nested URL) parameters.
       #
-      # @return [Object, Array<Object>, nil]
+      # @return [ActiveCachedResource::Collection, ActiveCachedResource::Resource, nil]
+      #   Returns the requested resource(s) based on the scope:
       #   * Returns a single resource object if `:one`, `:first`, `:last`, or an ID is given.
-      #   * Returns an array of resources if `:all` is given.
+      #   * Returns an ActiveCachedResource::Collection containing the resources if `:all` is given.
       #   * Returns `nil` if no data is found for `:one`, `:first`, `:last`, or `:all` queries.
       #
       # @raise [ResourceNotFound]
@@ -148,7 +149,7 @@ module ActiveCachedResource
       #
       # @return [void]
       def clear_cache
-        cached_resource.logger.info("Clearing cache for #{name} cache with prefix: #{cache_key_prefix}")
+        cached_resource.logger.debug("Clearing cache for #{name} cache with prefix: #{cache_key_prefix}")
         cached_resource.cache.clear(cache_key_prefix)
       end
 
@@ -166,7 +167,7 @@ module ActiveCachedResource
 
         return nil if json_string.nil?
 
-        cached_resource.logger.info("[KEY:#{key}] Cache hit")
+        cached_resource.logger.debug("[KEY:#{key}] Cache hit")
         json_to_object(json_string)
       end
 
@@ -242,10 +243,16 @@ module ActiveCachedResource
 
         case resource
         when Array
-          resource.map do |attrs|
+          elements = resource.map do |attrs|
             new(attrs["object"], attrs["persistence"]).tap do |r|
               r.prefix_options = object["prefix_options"]
             end
+          end
+          object["collection_parser"].constantize.new(elements, object["from"]).tap do |parser|
+            parser.resource_class = self
+            parser.query_params = object["query_params"] || {}
+            parser.prefix_options = object["prefix_options"] || {}
+            parser.path_params = object["path_params"] || {}
           end
         else
           new(resource["object"], resource["persistence"]).tap do |r|
@@ -258,13 +265,16 @@ module ActiveCachedResource
         options = extract_options(*)
         params = options.fetch(:params, {})
         prefix_options, query_options = split_options(params)
-        json_object = if object.is_a? Enumerable
-          {
+        json_object = case object
+        when ActiveCachedResource::Collection
+          object.virtual_persistable_attributes.merge({
             resource: object.map { |o| {object: o, persistence: o.persisted?} },
-            prefix_options: prefix_options,
+            collection_parser: object.class.name,
+            from: object.from,
             path_params: params,
+            prefix_options: prefix_options,
             query_params: query_options
-          }
+          })
         else
           {
             resource: {object: object, persistence: object.persisted?},
