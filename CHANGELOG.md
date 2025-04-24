@@ -1,4 +1,4 @@
-## [0.2.0] - 2024-04-25
+## [0.2.0] - 2024-04-24
 - Allow virtual attributes to be persisted into cache with introduction of `ActiveCachedResource::Collection.persisted_attribute`.
 - Optimized cache key generation by switching from `SHA-256` to `MD5`, improving hashing performance while maintaining uniqueness.
 
