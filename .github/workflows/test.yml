@@ -15,7 +15,7 @@ jobs:
         include:
           - ruby: "3.2"
           - ruby: "3.3"
-          - ruby: head
+          - ruby: "3.4"
     steps:
       - uses: actions/checkout@v4
       - name: Load dotenv into workflow

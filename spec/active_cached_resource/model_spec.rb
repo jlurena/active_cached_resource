@@ -20,7 +20,8 @@ RSpec.describe ActiveCachedResource::Model do
       TestResource.setup_cached_resource!(
         cache_store: ActiveSupport::Cache::MemoryStore.new,
         cache_strategy: :active_support_cache,
-        ttl: 600
+        ttl: 600,
+        logger: Logger.new(IO::NULL)
       )
     end
 

@@ -1,0 +1,17 @@
+---
+
+services:
+  app:
+    container_name: acr
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: bash scripts/run_tests.sh
+    volumes:
+      - .:/app
