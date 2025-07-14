@@ -1226,6 +1226,10 @@ module ActiveResource
       load(attributes, false, persisted)
     end
 
+    def [](key)
+      public_send(key)
+    end
+
     # Returns a \clone of the resource that hasn't been assigned an +id+ yet and
     # is treated as a \new resource.
     #

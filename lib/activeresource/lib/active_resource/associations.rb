@@ -2,10 +2,10 @@
 
 module ActiveResource::Associations
   module Builder
-    autoload :Association, "active_resource/associations/builder/association"
-    autoload :HasMany,     "active_resource/associations/builder/has_many"
-    autoload :HasOne,      "active_resource/associations/builder/has_one"
-    autoload :BelongsTo,   "active_resource/associations/builder/belongs_to"
+    autoload :Association, "activeresource/lib/active_resource/associations/builder/association"
+    autoload :HasMany,     "activeresource/lib/active_resource/associations/builder/has_many"
+    autoload :HasOne,      "activeresource/lib/active_resource/associations/builder/has_one"
+    autoload :BelongsTo,   "activeresource/lib/active_resource/associations/builder/belongs_to"
   end
 
 
@@ -148,9 +148,9 @@ module ActiveResource::Associations
       elsif attributes.include?(method_name)
         attributes[method_name]
       elsif !new_record?
-        instance_variable_set(ivar_name, reflection.klass.find(:all, params: { "#{self.class.element_name}_id": self.id }))
+        instance_variable_set(ivar_name, reflection.klass.find(:all, params: { self.class.primary_key => self.id }))
       else
-        instance_variable_set(ivar_name, reflection.klass.find(:all))
+        instance_variable_set(ivar_name, reflection.klass.none)
       end
     end
   end
