@@ -1619,4 +1619,53 @@ class BaseTest < ActiveSupport::TestCase
   ensure
     ActiveResource::Base.include_format_in_path = true
   end
+
+  def test_custom_primary_key_reader_and_writer
+    klass = Class.new(ActiveResource::Base)
+    assert_nil klass.custom_primary_key
+
+    klass.primary_key = :uuid
+    assert_equal :uuid, klass.custom_primary_key
+
+    klass.primary_key = "custom_id"
+    assert_equal "custom_id", klass.custom_primary_key
+  end
+
+  def test_custom_primary_key_does_not_affect_default_primary_key
+    klass = Class.new(ActiveResource::Base)
+    assert_equal "id", klass.primary_key
+    assert_nil klass.custom_primary_key
+
+    klass.primary_key = :uuid
+    assert_equal :uuid, klass.primary_key
+    assert_equal :uuid, klass.custom_primary_key
+  end
+
+  def test_custom_primary_key_inheritance
+    parent = Class.new(ActiveResource::Base)
+    child = Class.new(parent)
+
+    parent.primary_key = :uuid
+    assert_equal :uuid, parent.custom_primary_key
+    assert_nil child.custom_primary_key
+
+    child.primary_key = :custom_id
+    assert_equal :custom_id, child.custom_primary_key
+    assert_equal :uuid, parent.custom_primary_key
+  end
+
+  def test_none_returns_empty_collection
+    none_result = Person.none
+    assert_kind_of ActiveResource::Collection, none_result
+    assert_empty none_result
+  end
+
+  def test_none_with_custom_collection_parser
+    custom_parser = Class.new(ActiveResource::Collection)
+    klass = Class.new(ActiveResource::Base)
+    klass.collection_parser = custom_parser
+    none_result = klass.none
+    assert_kind_of custom_parser, none_result
+    assert_empty none_result
+  end
 end

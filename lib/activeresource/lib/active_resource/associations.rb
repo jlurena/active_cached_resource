@@ -1,11 +1,12 @@
 # frozen_string_literal: true
 
+require "pry-byebug" # IGNORE: This line is for debugging purposes and should be removed in production code.
 module ActiveResource::Associations
   module Builder
-    autoload :Association, "active_resource/associations/builder/association"
-    autoload :HasMany,     "active_resource/associations/builder/has_many"
-    autoload :HasOne,      "active_resource/associations/builder/has_one"
-    autoload :BelongsTo,   "active_resource/associations/builder/belongs_to"
+    autoload :Association, "activeresource/lib/active_resource/associations/builder/association"
+    autoload :HasMany,     "activeresource/lib/active_resource/associations/builder/has_many"
+    autoload :HasOne,      "activeresource/lib/active_resource/associations/builder/has_one"
+    autoload :BelongsTo,   "activeresource/lib/active_resource/associations/builder/belongs_to"
   end
 
 
@@ -148,9 +149,11 @@ module ActiveResource::Associations
       elsif attributes.include?(method_name)
         attributes[method_name]
       elsif !new_record?
-        instance_variable_set(ivar_name, reflection.klass.find(:all, params: { "#{self.class.element_name}_id": self.id }))
+        # Association would be set on custom primary key if explicitly defined, otherwise use convention _id
+        assoc_key = self.class.custom_primary_key || "#{self.class.element_name}_id"
+        instance_variable_set(ivar_name, reflection.klass.find(:all, params: { assoc_key => self.id }))
       else
-        instance_variable_set(ivar_name, reflection.klass.find(:all))
+        instance_variable_set(ivar_name, reflection.klass.none)
       end
     end
   end

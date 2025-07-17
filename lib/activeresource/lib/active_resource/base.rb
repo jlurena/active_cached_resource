@@ -672,6 +672,10 @@ module ActiveResource
         end
       end
 
+      def none
+        collection_parser.none
+      end
+
       # An instance of ActiveResource::Connection that is the base \connection to the remote service.
       # The +refresh+ parameter toggles whether or not the \connection is refreshed at every request
       # or not (defaults to <tt>false</tt>).
@@ -716,6 +720,10 @@ module ActiveResource
       end
 
       attr_writer :primary_key
+
+      def custom_primary_key
+        @primary_key
+      end
 
       def primary_key
         if defined?(@primary_key)
@@ -1224,6 +1232,10 @@ module ActiveResource
       @prefix_options = {}
       @persisted = persisted
       load(attributes, false, persisted)
+    end
+
+    def [](key)
+      public_send(key)
     end
 
     # Returns a \clone of the resource that hasn't been assigned an +id+ yet and
