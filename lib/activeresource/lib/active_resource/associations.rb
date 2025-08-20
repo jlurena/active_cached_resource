@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require "pry-byebug" # IGNORE: This line is for debugging purposes and should be removed in production code.
 module ActiveResource::Associations
   module Builder
     autoload :Association, "activeresource/lib/active_resource/associations/builder/association"
